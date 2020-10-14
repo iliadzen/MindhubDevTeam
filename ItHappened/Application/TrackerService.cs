@@ -7,31 +7,31 @@ namespace ItHappened.Application
 {
     public class TrackerService : ITrackerService
     {
-        public TrackerService(ITrackerRepository trackerRepository)
+        public TrackerService(IRepository<Tracker> repository)
         {
-            _trackerRepository = trackerRepository;
+            _repository = repository;
         }
         public Guid CreateTracker(TrackerCreationContent content)
         {
             var id = Guid.NewGuid();
             var tracker = new Tracker(id, content.UserId, content.Title, DateTime.Now, content.Customizations);
-            _trackerRepository.SaveTracker(tracker);
+            _repository.Save(tracker);
             return id;
         }
 
         public void EditTracker(Guid trackerId, TrackerEditingContent content)
         {
-            var oldTracker = _trackerRepository.GetTracker(trackerId);
+            var oldTracker = _repository.Get(trackerId);
             var newTracker = new Tracker(oldTracker.Id, oldTracker.UserId, content.Title, 
                 oldTracker.CreationDate,content.Customizations);
-            _trackerRepository.UpdateTracker(trackerId, newTracker);
+            _repository.Update(trackerId, newTracker);
         }
 
         public void DeleteTracker(Guid trackerId)
         {
-            _trackerRepository.DeleteTracker(trackerId);
+            _repository.Delete(trackerId);
         }
         
-        private readonly ITrackerRepository _trackerRepository;
+        private readonly IRepository<Tracker> _repository;
     }
 }
