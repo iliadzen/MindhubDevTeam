@@ -19,6 +19,14 @@ namespace ItHappened.Application
             return id;
         }
 
+        public void EditTracker(Guid trackerId, TrackerEditingContent content)
+        {
+            var oldTracker = _trackerRepository.GetTracker(trackerId);
+            var newTracker = new Tracker(oldTracker.Id, oldTracker.UserId, content.Title, 
+                oldTracker.CreationDate,content.Customizations);
+            _trackerRepository.UpdateTracker(trackerId, newTracker);
+        }
+
         public void DeleteTracker(Guid trackerId)
         {
             _trackerRepository.DeleteTracker(trackerId);
