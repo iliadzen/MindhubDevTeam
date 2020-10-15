@@ -1,5 +1,5 @@
 using System;
-using ItHappened.Domain;
+using System.Collections.Generic;
 
 namespace ItHappened.Infrastructure
 {
@@ -7,6 +7,7 @@ namespace ItHappened.Infrastructure
     {
         Guid Save(T entity);
         T Get(Guid id);
+        IReadOnlyCollection<T> GetAll();
         void Update(Guid id, T entity);
         void Delete(Guid id);
     }
