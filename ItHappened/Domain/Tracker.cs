@@ -9,15 +9,17 @@ namespace ItHappened.Domain
         public Guid UserId { get; }
         public string Title { get; }
         public DateTime CreationDate { get; }
-        public ISet<CustomizationType> Customizations { get; private set; }
+        public DateTime ModificationDate { get; }
+        public ISet<CustomizationType> Customizations { get; }
 
-        public Tracker(Guid id, Guid userId, string title,
-            DateTime creationDate, ISet<CustomizationType> customizations)
+        public Tracker(Guid id, Guid userId, string title, DateTime creationDate, 
+            DateTime modificationDate, ISet<CustomizationType> customizations)
         {
             Id = id;
             UserId = userId;
             Title = title;
             CreationDate = creationDate;
+            ModificationDate = modificationDate;
             Customizations = customizations;
         }
     }

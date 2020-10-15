@@ -14,7 +14,8 @@ namespace ItHappened.Application
         public Guid CreateTracker(TrackerCreationContent content)
         {
             var id = Guid.NewGuid();
-            var tracker = new Tracker(id, content.UserId, content.Title, DateTime.Now, content.Customizations);
+            var tracker = new Tracker(id, content.UserId, content.Title, DateTime.Now, 
+                DateTime.Now, content.Customizations);
             _repository.Save(tracker);
             return id;
         }
@@ -23,7 +24,7 @@ namespace ItHappened.Application
         {
             var oldTracker = _repository.Get(trackerId);
             var newTracker = new Tracker(oldTracker.Id, oldTracker.UserId, content.Title, 
-                oldTracker.CreationDate,content.Customizations);
+                oldTracker.CreationDate,DateTime.Now, content.Customizations);
             _repository.Update(trackerId, newTracker);
         }
 
