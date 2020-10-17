@@ -52,12 +52,17 @@ namespace ItHappened.Application
             return user;
         }
         
-        public Option<User> EditUser(UserForm userForm)
+        public Option<User> EditUser(Guid principalId, UserForm userForm)
         {
             string intent = $"edit user '{userForm.Id}'";
             if (userForm.Id.IsNone)
             {
                 Log.Information($"Failed: {intent} - form incomplete");
+                return Option<User>.None;
+            }
+            if (userForm.Id.ValueUnsafe() != principalId)
+            {
+                Log.Information($"Access denied: {intent}");
                 return Option<User>.None;
             }
             Option<User> user = GetById(userForm.Id.ValueUnsafe());
