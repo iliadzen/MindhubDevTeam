@@ -4,6 +4,7 @@ using System.Linq;
 using ItHappened.Domain;
 using ItHappened.Infrastructure;
 using LanguageExt;
+using LanguageExt.UnsafeValueAccess;
 using Serilog;
 
 namespace ItHappened.Application
@@ -13,8 +14,11 @@ namespace ItHappened.Application
         private IRepository<User> _userRepository;
         private IHasher _hasher;
 
-        public UserService(IRepository<User> userRepository) =>
+        public UserService(IRepository<User> userRepository, IHasher hasher)
+        {
             _userRepository = userRepository;
+            _hasher = hasher;
+        }
 
         public IEnumerable<User> GetAll() =>
             _userRepository.GetAll();
@@ -28,17 +32,40 @@ namespace ItHappened.Application
         public Option<User> CreateUser(UserForm userForm)
         {
             string intent = $"create new user named '{userForm.Username}'";
-            if (GetByUsername(userForm.Username).IsSome)
+
+            if (userForm.Username.IsNone || userForm.Password.IsNone)
+            {
+                Log.Information($"Failed: {intent} - form incomplete");
+                return Option<User>.None;
+            }
+            if (GetByUsername(userForm.Username.ValueUnsafe()).IsSome)
             {
                 Log.Information($"Failed: {intent} - username taken");
                 return Option<User>.None;
             }
-            
-            User user = new User(Guid.NewGuid(), userForm.Username, _hasher.MakeSaltedHash(userForm.Password),
+            User user = new User(Guid.NewGuid(),
+                userForm.Username.ValueUnsafe(), _hasher.MakeSaltedHash(userForm.Password.ValueUnsafe()),
                 new License(LicenseType.Free, DateTime.MaxValue), DateTime.Now, DateTime.Now);
             
             _userRepository.Save(user);
             Log.Information($"Success: {intent}");
+            return user;
+        }
+        
+        public Option<User> EditUser(UserForm userForm)
+        {
+            string intent = $"edit user '{userForm.Id}'";
+            if (userForm.Id.IsNone)
+            {
+                Log.Information($"Failed: {intent} - form incomplete");
+                return Option<User>.None;
+            }
+            Option<User> user = GetById(userForm.Id.ValueUnsafe());
+            user.Do(u =>
+            {
+                _userRepository.Save(u);
+                Log.Information($"Success: {intent}");
+            }); 
             return user;
         }
 
