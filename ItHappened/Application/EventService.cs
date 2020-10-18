@@ -3,7 +3,7 @@ using ItHappened.Domain;
 
 namespace ItHappened.Application
 {
-    public class EventService
+    public class EventService : IEventService
     {
         public IEventRepository EventRepository { get; }
 
@@ -45,28 +45,34 @@ namespace ItHappened.Application
         {
             if (!CanDeleteEvent(actorId, eventId)) throw new NotImplementedException();
             EventRepository.Delete(eventId);
-            // Cascade dependencies (CustomEventData) delete
+            // Cascade dependencies (CustomEventData) delete:
+            // GetCustomEventDataByEvent
+            // foreach delete
         }
 
         // Permission methods
-        // WIP: After other models will be created
+        // WIP: After other models and services will be created
         private bool CanCreateEvent(Guid userId)
         {
+            // Getting user and comparing userId and eventUserId
             throw new NotImplementedException();
         }
         
         private bool CanGetEvent(Guid userId, Guid eventId)
         {
+            // Getting user and comparing userId and eventUserId
             throw new NotImplementedException();
         }
         
         private bool CanEditEvent(Guid userId, Guid eventId)
         {
+            // Getting user and comparing userId and eventUserId
             throw new NotImplementedException();
         }
         
         private bool CanDeleteEvent(Guid userId, Guid eventId)
         {
+            // Getting user and comparing userId and eventUserId
             throw new NotImplementedException();
         }
     }
