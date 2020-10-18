@@ -25,29 +25,35 @@ namespace ItHappened.Application
         {
 
             var oldTracker = _trackersRepository.Get(trackerId);
-            if (content.UserId == oldTracker.UserId)
+            oldTracker.Do(oldTracker =>
             {
-                var newTracker = new Tracker(oldTracker.Id, oldTracker.UserId, content.Title,
-                    oldTracker.CreationDate, DateTime.Now, content.Customizations);
-                _trackersRepository.Update(trackerId, newTracker);
-            }
-            else
-            {
-                Logger.Error("User tried to edit someone else's tracker");
-            }
+                if (content.UserId == oldTracker.UserId)
+                {
+                    var newTracker = new Tracker(oldTracker.Id, oldTracker.UserId, content.Title,
+                        oldTracker.CreationDate, DateTime.Now, content.Customizations);
+                    _trackersRepository.Update(newTracker);
+                }
+                else
+                {
+                    Logger.Error("User tried to edit someone else's tracker");
+                }
+            });
         }
 
         public void DeleteTracker(Guid userId, Guid trackerId)
         {
             var tracker = _trackersRepository.Get(trackerId);
-            if (userId == tracker.UserId)
+            tracker.Do(tracker =>
             {
-                _trackersRepository.Delete(trackerId);
-            }
-            else
-            {
-                Logger.Error("User tried to delete someone else's tracker");
-            }
+                if (userId == tracker.UserId)
+                {
+                    _trackersRepository.Delete(trackerId);
+                }
+                else
+                {
+                    Logger.Error("User tried to delete someone else's tracker");
+                }
+            });
         }
         
         public IReadOnlyCollection<Tracker> GetUserTrackers(Guid userId)
@@ -58,7 +64,8 @@ namespace ItHappened.Application
 
         public Tracker GetTracker(Guid trackerId)
         {
-            return _trackersRepository.Get(trackerId);
+            
+            return (Tracker) _trackersRepository.Get(trackerId).Map(tracker => tracker);
         }
         
         private readonly IRepository<Tracker> _trackersRepository;
