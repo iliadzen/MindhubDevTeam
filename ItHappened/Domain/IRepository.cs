@@ -1,14 +1,15 @@
 using System;
 using System.Collections.Generic;
+using LanguageExt;
 
 namespace ItHappened.Infrastructure
 {
     public interface IRepository<T>
     {
-        Guid Save(T entity);
-        T Get(Guid id);
+        void Save(T entity);
+        Option<T> Get(Guid id);
         IReadOnlyCollection<T> GetAll();
-        void Update(Guid id, T entity);
+        void Update(T entity);
         void Delete(Guid id);
     }
 }
