@@ -20,9 +20,6 @@ namespace ItHappened.Application
             _hasher = hasher;
         }
 
-        public IEnumerable<User> GetAll() =>
-            _userRepository.GetAll();
-
         public Option<User> GetById(Guid userId) =>
             _userRepository.Get(userId);
 
