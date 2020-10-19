@@ -20,11 +20,11 @@ namespace ItHappened.Application
             _hasher = hasher;
         }
 
-        public Option<User> GetById(Guid userId) =>
-            _userRepository.Get(userId);
+        public Option<User> GetById(Guid actorId, Guid userId) =>
+            actorId == userId ? GetById(userId) : null;
 
-        public Option<User> GetByUsername(string username) =>
-            _userRepository.GetAll().SingleOrDefault(user => user.Username == username);
+        public Option<User> GetByUsername(Guid actorId, string username) =>
+            _userRepository.GetAll().SingleOrDefault(user => user.Username == username && user.Id == actorId);
 
         public Option<User> CreateUser(UserForm userForm)
         {
@@ -97,5 +97,11 @@ namespace ItHappened.Application
             }
             return user;
         }
+        
+        private Option<User> GetByUsername(string username) =>
+            _userRepository.GetAll().SingleOrDefault(user => user.Username == username);
+        
+        private Option<User> GetById(Guid userId) =>
+            _userRepository.Get(userId);
     }
 }
