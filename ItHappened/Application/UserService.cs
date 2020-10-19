@@ -49,7 +49,7 @@ namespace ItHappened.Application
             return user;
         }
         
-        public Option<User> EditUser(Guid principalId, UserForm userForm)
+        public Option<User> EditUser(Guid actorId, UserForm userForm)
         {
             string intent = $"edit user '{userForm.Id}'";
             if (userForm.Id.IsNone)
@@ -57,7 +57,7 @@ namespace ItHappened.Application
                 Log.Information($"Failed: {intent} - form incomplete");
                 return Option<User>.None;
             }
-            if (userForm.Id.ValueUnsafe() != principalId)
+            if (userForm.Id.ValueUnsafe() != actorId)
             {
                 Log.Information($"Access denied: {intent}");
                 return Option<User>.None;
@@ -71,12 +71,12 @@ namespace ItHappened.Application
             return user;
         }
 
-        public void SetPassword(Guid principalId, Guid userId, string oldPassword, string newPassword)
+        public void SetPassword(Guid actorId, Guid userId, string oldPassword, string newPassword)
         {
             string intent = $"modify password for user '{userId}'";
             Option<User> modifiedUser = GetById(userId);
             if (!modifiedUser.Exists(user => 
-                    user.Id == principalId 
+                    user.Id == actorId 
                     && _hasher.VerifySaltedHash(oldPassword, user.PasswordHash)))
                 Log.Information($"Access denied: {intent}");
 
