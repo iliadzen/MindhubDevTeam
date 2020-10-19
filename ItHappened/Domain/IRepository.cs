@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using LanguageExt;
 
-namespace ItHappened.Infrastructure
+namespace ItHappened.Domain
 {
     public interface IRepository<T>
     {
