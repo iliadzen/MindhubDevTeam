@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ItHappened.Domain;
-using ItHappened.Infrastructure;
+using Serilog;
 
 namespace ItHappened.Application
 {
@@ -35,7 +35,7 @@ namespace ItHappened.Application
                 }
                 else
                 {
-                    Logger.Error("User tried to edit someone else's tracker");
+                    Log.Error("User tried to edit someone else's tracker");
                 }
             });
         }
@@ -51,7 +51,7 @@ namespace ItHappened.Application
                 }
                 else
                 {
-                    Logger.Error("User tried to delete someone else's tracker");
+                    Log.Error("User tried to delete someone else's tracker");
                 }
             });
         }
