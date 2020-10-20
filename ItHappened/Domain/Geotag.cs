@@ -1,6 +1,6 @@
 namespace ItHappened.Domain
 {
-    public class Geotag
+    public class Geotag : EventCustomizationData
     {
         public double Longitude { get; }
         public double Latitude { get; }

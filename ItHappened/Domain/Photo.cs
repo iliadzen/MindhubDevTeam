@@ -1,14 +1,12 @@
 namespace ItHappened.Domain
 {
-    public class Photo
+    public class Photo : EventCustomizationData
     {
-        public string Name { get; }
         public byte[] File { get;  }
 
         public Photo(string name, byte[] file)
         {
             File = file;
-            Name = name;
         }
     }
 }
