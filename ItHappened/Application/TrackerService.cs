@@ -10,87 +10,67 @@ namespace ItHappened.Application
 {
     public class TrackerService : ITrackerService
     {
-        private readonly IRepository<Tracker> _trackersRepository;
         public TrackerService(IRepository<Tracker> trackersRepository)
         {
             _trackersRepository = trackersRepository;
         }
-        public void CreateTracker(Guid actorId, TrackerCreationContent content)
+        public void CreateTracker(Guid actorId, TrackerCreationForm form)
         {
-            if (!CanCreateTracker(actorId)) {
-                Logger.Error("User can't create tracker");
-                return;
-            }
-            var trackerId = Guid.NewGuid();
-            var tracker = new Tracker(trackerId, actorId, content.Title, DateTime.Now, 
-                DateTime.Now, content.Customizations);
+            var tracker = new Tracker(Guid.NewGuid(), actorId, form.Title, DateTime.Now, 
+                DateTime.Now, form.Customizations);
             _trackersRepository.Save(tracker);
         }
 
-        public void EditTracker(Guid actorId, Guid trackerId, TrackerCreationContent content)
+        public void EditTracker(Guid actorId, Guid trackerId, TrackerCreationForm form)
         {
-            if (!CanEditTracker(actorId, trackerId)) {
-                Logger.Error("User tried to edit someone else's tracker");
-                return;
-            }
             var oldTracker = _trackersRepository.Get(trackerId);
             oldTracker.Do(tracker =>
             {
-                var newTracker = new Tracker(tracker.Id, tracker.UserId, content.Title,
-                    tracker.CreationDate, DateTime.Now, content.Customizations);
+                if (actorId != tracker.UserId)
+                {
+                    Logger.Error($"User {actorId} tried to edit someone else's tracker");
+                    return;
+                }
+                var newTracker = new Tracker(tracker.Id, tracker.UserId, form.Title,
+                    tracker.CreationDate, DateTime.Now, form.Customizations);
                 _trackersRepository.Update(newTracker);
             });
         }
 
         public void DeleteTracker(Guid actorId, Guid trackerId)
         {
-            if (!CanDeleteTracker(actorId, trackerId)) {
-                Logger.Error("User tried to edit someone else's tracker");
-                return;
-            }
-            _trackersRepository.Delete(trackerId);
+            var optionTracker = _trackersRepository.Get(trackerId);
+            optionTracker.Do(tracker =>
+            {
+                if (actorId != tracker.UserId)
+                {
+                    Logger.Error($"User {actorId} tried to delete someone else's tracker");
+                    return;
+                }
+                _trackersRepository.Delete(trackerId);
+            });
         }
         
         public IReadOnlyCollection<Tracker> GetUserTrackers(Guid userId)
         {
             var trackers = _trackersRepository.GetAll();
-            return trackers.Where(tracker => tracker.UserId == userId) as IReadOnlyCollection<Tracker>;
+            return (IReadOnlyCollection<Tracker>)trackers.Where(tracker => tracker.UserId == userId);
         }
 
         public Option<Tracker> GetTracker(Guid actorId, Guid trackerId)
         {
-            if (!CanGetTracker(actorId, trackerId))
+            var optionTracker = _trackersRepository.Get(trackerId);
+            return optionTracker.Map(tracker =>
             {
-                Logger.Error("User tried to get someone else's tracker");
-                return Option<Tracker>.None;
-            }
-            return _trackersRepository.Get(trackerId);
-        }
-
-        private bool CanCreateTracker(Guid userId)
-        {
-            return true;
+                if (actorId != tracker.UserId)
+                {
+                    Logger.Error($"User {actorId} tried to get someone else's tracker");
+                    return null;
+                }
+                return tracker;
+            });
         }
         
-        private bool CanGetTracker(Guid userId, Guid trackerId)
-        {
-            var tracker = _trackersRepository.Get(trackerId);
-            if (tracker.IsNone) return false;
-            return tracker.ValueUnsafe().UserId == userId;
-        }
-        
-        private bool CanEditTracker(Guid userId, Guid trackerId)
-        {
-            var tracker = _trackersRepository.Get(trackerId);
-            if (tracker.IsNone) return false;
-            return tracker.ValueUnsafe().UserId == userId;
-        }
-        
-        private bool CanDeleteTracker(Guid userId, Guid trackerId)
-        {
-            var tracker = _trackersRepository.Get(trackerId);
-            if (tracker.IsNone) return false;
-            return tracker.ValueUnsafe().UserId == userId;
-        }
+        private readonly IRepository<Tracker> _trackersRepository;
     }
 }
