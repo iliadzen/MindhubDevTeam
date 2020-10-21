@@ -19,79 +19,72 @@ namespace ItHappened.Application
             TrackerRepository = trackerRepository ?? throw new ArgumentNullException(nameof(trackerRepository));
         }
 
-        public void CreateEvent(Guid actorId, Guid trackerId, string title)
+        public void CreateEvent(Guid actorId, Guid trackerId, EventContent eventContent)
         {
-            if (!CanCreateEvent(actorId)) return;
-            if (title == null) throw new ArgumentNullException(nameof(title));
-            var eventId = Guid.NewGuid();
-            var @event = new Event(eventId, trackerId, title, DateTime.Now, DateTime.Now);
-            EventRepository.Save(@event);
+            if (eventContent.IsNull()) return;
+            var optionTracker = TrackerRepository.Get(trackerId);
+            optionTracker.Do(tracker =>
+            {
+                if (actorId != tracker.UserId) return;
+                var eventId = Guid.NewGuid();
+                var @event = new Event(eventId, trackerId, eventContent.Title, DateTime.Now, DateTime.Now);
+                EventRepository.Save(@event);
+            });
         }
         
         public Option<Event> GetEvent(Guid actorId, Guid eventId)
         {
-            if (!CanGetEvent(actorId, eventId)) return Option<Event>.None;
-            var @event = EventRepository.Get(eventId);
-            return @event;
+            var optionEvent = EventRepository.Get(eventId);
+            return optionEvent.Match(
+                Some: @event =>
+                {
+                    var optionTracker = TrackerRepository.Get(@event.TrackerId);
+                    return optionTracker.Match(
+                        Some: tracker => actorId == tracker.UserId ? Option<Event>.None : optionEvent,
+                        None: Option<Event>.None);
+                },
+                None: Option<Event>.None);
         }
 
-        public IEnumerable<Event> GetEventsByTrackerId(Guid trackerId)
+        public IReadOnlyCollection<Event> GetEventsByTrackerId(Guid trackerId)
         {
-            return EventRepository.GetAll().Where(@event =>
+            return (IReadOnlyCollection<Event>) EventRepository.GetAll().Where(@event =>
                 @event.TrackerId == trackerId);
         }
         
-        public void EditEvent(Guid actorId, Guid eventId, string title)
+        public void EditEvent(Guid actorId, Guid eventId, EventContent eventContent)
         {
-            if (!CanEditEvent(actorId, eventId)) return;
-            var @event = GetEvent(actorId, eventId);
-            @event.Do(@event =>
+            if (eventContent.IsNull()) return;
+            var optionEvent = EventRepository.Get(eventId);
+            optionEvent.Do(@event =>
             {
-                @event.Title = title;
-                @event.ModificationDate = DateTime.Now;
-                EventRepository.Update(@event);
+                var optionTracker = TrackerRepository.Get(@event.TrackerId);
+                optionTracker.Do(tracker =>
+                {
+                    if (actorId != tracker.UserId) return;
+                    @event.Title = eventContent.Title;
+                    @event.ModificationDate = DateTime.Now;
+                    EventRepository.Update(@event);
+
+                });
             });
         }
         
         public void DeleteEvent(Guid actorId, Guid eventId)
         {
-            if (!CanDeleteEvent(actorId, eventId)) return;
-            EventRepository.Delete(eventId);
-            // Cascade dependencies (CustomEventData) delete:
-            // GetCustomEventDataByEvent
-            // foreach delete
-        }
-
-        private bool CanCreateEvent(Guid userId)
-        {
-            return true;
-        }
-        
-        private bool CanGetEvent(Guid userId, Guid eventId)
-        {
-            var @event = EventRepository.Get(eventId);
-            if (@event.IsNone) return false;
-            var tracker = TrackerRepository.Get(@event.ValueUnsafe().TrackerId);
-            if (tracker.IsNone) return false;
-            return userId == tracker.ValueUnsafe().UserId;
-        }
-        
-        private bool CanEditEvent(Guid userId, Guid eventId)
-        {
-            var @event = EventRepository.Get(eventId);
-            if (@event.IsNone) return false;
-            var tracker = TrackerRepository.Get(@event.ValueUnsafe().TrackerId);
-            if (tracker.IsNone) return false;
-            return userId == tracker.ValueUnsafe().UserId;
-        }
-        
-        private bool CanDeleteEvent(Guid userId, Guid eventId)
-        {
-            var @event = EventRepository.Get(eventId);
-            if (@event.IsNone) return false;
-            var tracker = TrackerRepository.Get(@event.ValueUnsafe().TrackerId);
-            if (tracker.IsNone) return false;
-            return userId == tracker.ValueUnsafe().UserId;
+            var optionEvent = EventRepository.Get(eventId);
+            optionEvent.Do(@event =>
+            {
+                var optionTracker = TrackerRepository.Get(@event.TrackerId);
+                optionTracker.Do(tracker =>
+                {
+                    if (actorId != tracker.UserId) return;
+                    EventRepository.Delete(eventId);
+                    // Cascade dependencies (CustomEventData) delete:
+                    // GetCustomEventDataByEvent
+                    // foreach delete
+                });
+            });
         }
     }
 }

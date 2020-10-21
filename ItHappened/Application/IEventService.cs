@@ -7,10 +7,10 @@ namespace ItHappened.Application
 {
     public interface IEventService
     {
-        void CreateEvent(Guid actorId, Guid trackerId, string title);
+        void CreateEvent(Guid actorId, Guid trackerId, EventContent eventContent);
         Option<Event> GetEvent(Guid actorId, Guid eventId);
-        IEnumerable<Event> GetEventsByTrackerId(Guid trackerId);
-        void EditEvent(Guid actorId, Guid eventId, string title);
+        IReadOnlyCollection<Event> GetEventsByTrackerId(Guid trackerId);
+        void EditEvent(Guid actorId, Guid eventId, EventContent eventContent);
         void DeleteEvent(Guid actorId, Guid eventId);
     }
 }
