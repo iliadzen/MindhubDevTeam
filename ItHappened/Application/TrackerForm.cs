@@ -4,12 +4,12 @@ using ItHappened.Domain;
 
 namespace ItHappened.Application
 {
-    public class TrackerCreationForm
+    public class TrackerForm
     {
         public string Title { get; }
         public ISet<CustomizationType> Customizations { get; }
 
-        public TrackerCreationForm(string title, ISet<CustomizationType> customizations)
+        public TrackerForm(string title, ISet<CustomizationType> customizations)
         {
             Title = title;
             Customizations = customizations;

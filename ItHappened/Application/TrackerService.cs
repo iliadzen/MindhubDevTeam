@@ -2,9 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ItHappened.Domain;
-using ItHappened.Infrastructure;
 using LanguageExt;
+using LanguageExt.Common;
 using LanguageExt.UnsafeValueAccess;
+using Serilog;
 
 namespace ItHappened.Application
 {
@@ -14,21 +15,21 @@ namespace ItHappened.Application
         {
             _trackersRepository = trackersRepository;
         }
-        public void CreateTracker(Guid actorId, TrackerCreationForm form)
+        public void CreateTracker(Guid actorId, TrackerForm form)
         {
             var tracker = new Tracker(Guid.NewGuid(), actorId, form.Title, DateTime.Now, 
                 DateTime.Now, form.Customizations);
             _trackersRepository.Save(tracker);
         }
 
-        public void EditTracker(Guid actorId, Guid trackerId, TrackerCreationForm form)
+        public void EditTracker(Guid actorId, Guid trackerId, TrackerForm form)
         {
             var oldTracker = _trackersRepository.Get(trackerId);
             oldTracker.Do(tracker =>
             {
                 if (actorId != tracker.UserId)
                 {
-                    Logger.Error($"User {actorId} tried to edit someone else's tracker");
+                    Log.Error($"User {actorId} tried to edit someone else's tracker");
                     return;
                 }
                 var newTracker = new Tracker(tracker.Id, tracker.UserId, form.Title,
@@ -44,7 +45,7 @@ namespace ItHappened.Application
             {
                 if (actorId != tracker.UserId)
                 {
-                    Logger.Error($"User {actorId} tried to delete someone else's tracker");
+                    Log.Error($"User {actorId} tried to delete someone else's tracker");
                     return;
                 }
                 _trackersRepository.Delete(trackerId);
@@ -60,17 +61,21 @@ namespace ItHappened.Application
         public Option<Tracker> GetTracker(Guid actorId, Guid trackerId)
         {
             var optionTracker = _trackersRepository.Get(trackerId);
-            return optionTracker.Map(tracker =>
-            {
-                if (actorId != tracker.UserId)
+            if (optionTracker.IsSome)
+                if (actorId != optionTracker.ValueUnsafe().UserId)
                 {
-                    Logger.Error($"User {actorId} tried to get someone else's tracker");
-                    return null;
+                    Log.Error($"User {actorId} tried to get someone else's tracker");
+                    return Option<Tracker>.None;
                 }
-                return tracker;
-            });
+                else
+                    return optionTracker;
+            else
+            {
+                Log.Error($"Tracker {trackerId} not exists");
+                return Option<Tracker>.None;
+            }
         }
-        
+
         private readonly IRepository<Tracker> _trackersRepository;
     }
 }
