@@ -1,265 +1,278 @@
 using System;
 using ItHappened.Domain;
 using NUnit.Framework;
-using NUnit.Framework.Internal;
-using System.Collections.Generic;
 using System.Linq;
+using AutoFixture;
 using ItHappened.Application;
-using LanguageExt;
 using LanguageExt.UnsafeValueAccess;
-using List = LanguageExt.List;
 
 namespace ItHappened.Tests
 {
-    public class RepositoryMock<T> : IRepository<T>
-        where T : IEntity
-    {
-        public List<T> _repository;
-
-        public RepositoryMock()
-        {
-            _repository = new List<T>();
-        }
-
-        public void Save(T entity)
-        {
-            if (!_repository.Contains(entity))
-            {
-                _repository.Add(entity);
-            }
-        }
-
-        public Option<T> Get(Guid id)
-        {
-            return _repository.SingleOrDefault(entity => entity.Id == id);
-        }
-
-        public IReadOnlyCollection<T> GetAll()
-        {
-            return (IReadOnlyCollection<T>) _repository;
-        }
-
-        public void Update(T entity)
-        {
-            Option<T> oldEntity = _repository.SingleOrDefault(e => e.Id == entity.Id);
-            oldEntity.Do(e =>
-            {
-                _repository.Remove(e);
-                _repository.Add(entity);
-            });
-        }
-
-        public void Delete(Guid id)
-        {
-            Option<T> entity = _repository.SingleOrDefault(e => e.Id == id);
-            entity.Do(e =>
-            {
-                _repository.Remove(e);
-            });
-        }
-    }
+    [TestFixture]
     public class EventServiceTests
     {
+        [SetUp]
+        public void SetUp()
+        {
+            _fixture = new Fixture();
+            _mockUserRepository = new RepositoryMock<User>();
+            _mockTrackerRepository = new RepositoryMock<Tracker>();
+            _mockEventRepository = new RepositoryMock<Event>();
+
+            _userOne = _fixture.Create<User>();
+            _userTwo = _fixture.Create<User>();
+            _mockUserRepository.Save(_userOne);
+            _mockUserRepository.Save(_userTwo);
+
+            _trackerUserOne = CreateSomeTracker(_userOne.Id);
+            _trackerUserTwo = CreateSomeTracker(_userTwo.Id);
+            _mockTrackerRepository.Save(_trackerUserOne);
+            _mockTrackerRepository.Save(_trackerUserTwo);
+
+            _eventService = new EventService(_mockEventRepository, _mockTrackerRepository);
+        }
+
         [Test]
-        public void CreateEvent_ValidData_SuccessfullyCreated()
+        public void CreateEvent_ValidData_EventCreated()
         {
             // Arrange
-            var userRepository = new RepositoryMock<User>();
-            var userId = Guid.NewGuid();
-            var user = new User(
-                userId,
-                "testUsername",
-                "testPasswordHash",
-                new License(LicenseType.Premium, DateTime.Now),
-                DateTime.Now,
-                DateTime.Now);
-            userRepository.Save(user);
-
-            var trackerRepository = new RepositoryMock<Tracker>();
-            var trackerId = Guid.NewGuid();
-            trackerRepository.Save(
-                new Tracker(
-                    trackerId,
-                    userId,
-                    "testTitle",
-                    DateTime.Now,
-                    DateTime.Now,
-                    new System.Collections.Generic.HashSet<CustomizationType>()));
-            var eventRepository = new RepositoryMock<Event>();
-            
-            
-            var eventService = new EventService(eventRepository, trackerRepository);
-            var eventId = Guid.NewGuid();
             var eventContent = new EventContent("testTitle");
+
+            // Act
+            _eventService.CreateEvent(_userOne.Id, _trackerUserOne.Id, eventContent);
+
+            // Assert
+            var @event = _mockEventRepository.GetAll().First();
+            Assert.AreEqual(_trackerUserOne.Id, @event.TrackerId);
+            Assert.AreEqual(eventContent.Title, @event.Title);
+        }
+
+        [Test]
+        public void CreateEvent_NullContent_EventNotCreated()
+        {
+            // Arrange
+            var eventContent = new EventContent(null);
             
             // Act
-            eventService.CreateEvent(userId, trackerId, eventContent);
+            _eventService.CreateEvent(_userOne.Id, _trackerUserOne.Id, eventContent);
             
             // Assert
-            var @event = eventRepository.GetAll().First();
-            Assert.AreEqual(trackerId, @event.TrackerId);
-            Assert.AreEqual(eventContent.Title, @event.Title);
+            var eventsCount = _mockEventRepository.GetAll().Count();
+            Assert.AreEqual(0, eventsCount);
         }
         
         [Test]
-        public void GetEvent_ValidData_SuccessfullyGot()
+        public void GetEvent_UserGetsOwnEvent_SuccessfullyGot()
         {
             // Arrange
-            var userRepository = new RepositoryMock<User>();
-            var userId = Guid.NewGuid();
-            var user = new User(
-                userId,
-                "testUsername",
-                "testPasswordHash",
-                new License(LicenseType.Premium, DateTime.Now),
-                DateTime.Now,
-                DateTime.Now);
-            userRepository.Save(user);
-
-            var trackerRepository = new RepositoryMock<Tracker>();
-            var trackerId = Guid.NewGuid();
-            trackerRepository.Save(
-                new Tracker(
-                    trackerId,
-                    userId,
-                    "testTitle",
-                    DateTime.Now,
-                    DateTime.Now,
-                    new System.Collections.Generic.HashSet<CustomizationType>()));
-            var eventRepository = new RepositoryMock<Event>();
+            var @event = CreateSomeEvent(_trackerUserOne.Id);
+            _mockEventRepository.Save(@event);
             
-            
-            var eventService = new EventService(eventRepository, trackerRepository);
-            var eventContent = new EventContent("testTitle");
-            var createdEvent = eventService.CreateEvent(userId, trackerId, eventContent);
-            var eventId = createdEvent.ValueUnsafe().Id;
-
             // Act
-            var @event = eventService.GetEvent(userId, eventId).ValueUnsafe();
+            var gottenEvent = _eventService.GetEvent(_userOne.Id, @event.Id).ValueUnsafe();
 
             // Assert
-            Assert.AreEqual(trackerId, @event.TrackerId);
-            Assert.AreEqual(eventContent.Title, @event.Title);
+            Assert.AreEqual(@event.Id, gottenEvent.Id);
+            Assert.AreEqual(@event.TrackerId, gottenEvent.TrackerId);
+            Assert.AreEqual(@event.Title, gottenEvent.Title);
         }
         
         [Test]
-        public void GetEventsByTrackerId_InRepositoryTwoNeededEvents_SuccessfullyGotTwo()
+        public void GetEvent_UserGetsSomeonesEvent_EventNotGot()
         {
             // Arrange
-            var userRepository = new RepositoryMock<User>();
-            var userId = Guid.NewGuid();
-            var user = new User(
-                userId,
-                "testUsername",
-                "testPasswordHash",
-                new License(LicenseType.Premium, DateTime.Now),
-                DateTime.Now,
-                DateTime.Now);
-            userRepository.Save(user);
-
-            var trackerRepository = new RepositoryMock<Tracker>();
-            var trackerId = Guid.NewGuid();
-            trackerRepository.Save(
-                new Tracker(
-                    trackerId,
-                    userId,
-                    "testTitle",
-                    DateTime.Now,
-                    DateTime.Now,
-                    new System.Collections.Generic.HashSet<CustomizationType>()));
-            var eventRepository = new RepositoryMock<Event>();
+            var @event = CreateSomeEvent(_trackerUserOne.Id);
+            _mockEventRepository.Save(@event);
             
-            
-            var eventService = new EventService(eventRepository, trackerRepository);
-            
-            eventService.CreateEvent(userId, trackerId, new EventContent("1"));
-            eventService.CreateEvent(userId, trackerId, new EventContent("2"));
-
             // Act
-            var events = eventService.GetEventsByTrackerId(userId, trackerId);
+            var gottenEvent = _eventService.GetEvent(_userTwo.Id, @event.Id).ValueUnsafe();
+
+            // Assert
+            Assert.AreEqual(null, gottenEvent);
+        }
+        
+        [Test]
+        public void GetEvent_UserGetsNoExistedEvent_EventNotGot()
+        {
+            // Arrange
+            var @event = CreateSomeEvent(_trackerUserOne.Id);
+            _mockEventRepository.Save(@event);
+            
+            // Act
+            var gottenEvent = _eventService.GetEvent(_userOne.Id, Guid.NewGuid()).ValueUnsafe();
+
+            // Assert
+            Assert.AreEqual(null, gottenEvent);
+        }
+        
+        [Test]
+        public void GetEventsByTrackerId_UserHaveTwoEventsInRepositoryAndGetsIt_SuccessfullyGotTwo()
+        {
+            // Arrange
+            var eventOne = CreateSomeEvent(_trackerUserOne.Id);
+            var eventTwo = CreateSomeEvent(_trackerUserOne.Id);
+            _mockEventRepository.Save(eventOne);
+            _mockEventRepository.Save(eventTwo);
+            
+            // Act
+            var events = _eventService.GetEventsByTrackerId(_userOne.Id, _trackerUserOne.Id);
 
             // Assert
             Assert.AreEqual(2, events.Count);
         }
         
         [Test]
-        public void EditEvent_ValidData_SuccessfullyEdited()
+        public void GetEventsByTrackerId_SomeoneWantsToGetOthersEvents_EventsNotGot()
         {
             // Arrange
-            var userRepository = new RepositoryMock<User>();
-            var userId = Guid.NewGuid();
-            var user = new User(
-                userId,
-                "testUsername",
-                "testPasswordHash",
-                new License(LicenseType.Premium, DateTime.Now),
-                DateTime.Now,
-                DateTime.Now);
-            userRepository.Save(user);
-
-            var trackerRepository = new RepositoryMock<Tracker>();
-            var trackerId = Guid.NewGuid();
-            trackerRepository.Save(
-                new Tracker(
-                    trackerId,
-                    userId,
-                    "testTitle",
-                    DateTime.Now,
-                    DateTime.Now,
-                    new System.Collections.Generic.HashSet<CustomizationType>()));
-            var eventRepository = new RepositoryMock<Event>();
+            var eventOne = CreateSomeEvent(_trackerUserOne.Id);
+            var eventTwo = CreateSomeEvent(_trackerUserOne.Id);
+            _mockEventRepository.Save(eventOne);
+            _mockEventRepository.Save(eventTwo);
             
-            
-            var eventService = new EventService(eventRepository, trackerRepository);
-            
-            var @event = eventService.CreateEvent(userId, trackerId, new EventContent("1")).ValueUnsafe();
-
             // Act
-            eventService.EditEvent(userId, @event.Id, new EventContent("2"));
+            var events = _eventService.GetEventsByTrackerId(_userTwo.Id, _trackerUserOne.Id);
 
             // Assert
-            var editedEvent = eventRepository.Get(@event.Id).ValueUnsafe();
+            Assert.AreEqual(0, events.Count);
+        }
+        
+        [Test]
+        public void GetEventsByTrackerId_SomeoneWantsToGetEventsFromNotExistedTracker_EventsNotGot()
+        {
+            // Arrange
+            var eventOne = CreateSomeEvent(_trackerUserOne.Id);
+            var eventTwo = CreateSomeEvent(_trackerUserOne.Id);
+            _mockEventRepository.Save(eventOne);
+            _mockEventRepository.Save(eventTwo);
+            
+            // Act
+            var events = _eventService.GetEventsByTrackerId(_userOne.Id, Guid.NewGuid());
+
+            // Assert
+            Assert.AreEqual(0, events.Count);
+        }
+        
+        [Test]
+        public void EditEvent_UserEditOwnEvent_SuccessfullyEdited()
+        {
+            // Arrange
+            var @event = CreateSomeEvent(_trackerUserOne.Id);
+            _mockEventRepository.Save(@event);
+            
+            // Act
+            _eventService.EditEvent(_userOne.Id, @event.Id, new EventContent("2"));
+
+            // Assert
+            var editedEvent = _mockEventRepository.Get(@event.Id).ValueUnsafe();
             Assert.AreEqual("2", editedEvent.Title);
         }
         
         [Test]
-        public void DeleteEvent_ValidData_SuccessfullyDeleted()
+        public void EditEvent_UserEditOthersEvent_EventNotChanges()
         {
             // Arrange
-            var userRepository = new RepositoryMock<User>();
-            var userId = Guid.NewGuid();
-            var user = new User(
-                userId,
-                "testUsername",
-                "testPasswordHash",
-                new License(LicenseType.Premium, DateTime.Now),
-                DateTime.Now,
-                DateTime.Now);
-            userRepository.Save(user);
-
-            var trackerRepository = new RepositoryMock<Tracker>();
-            var trackerId = Guid.NewGuid();
-            trackerRepository.Save(
-                new Tracker(
-                    trackerId,
-                    userId,
-                    "testTitle",
-                    DateTime.Now,
-                    DateTime.Now,
-                    new System.Collections.Generic.HashSet<CustomizationType>()));
-            var eventRepository = new RepositoryMock<Event>();
+            var @event = CreateSomeEvent(_trackerUserOne.Id);
+            _mockEventRepository.Save(@event);
             
-            
-            var eventService = new EventService(eventRepository, trackerRepository);
-            
-            var @event = eventService.CreateEvent(userId, trackerId, new EventContent("1")).ValueUnsafe();
-
             // Act
-            eventService.DeleteEvent(userId, @event.Id);
+            _eventService.EditEvent(_userTwo.Id, @event.Id, new EventContent("2"));
 
             // Assert
-            var eventsCount = eventRepository._repository.Count();
+            var editedEvent = _mockEventRepository.Get(@event.Id).ValueUnsafe();
+            Assert.AreEqual(@event.Title, editedEvent.Title);
+        }
+        
+        [Test]
+        public void EditEvent_UserEditNotExistedEvent_NothingHappens()
+        {
+            // Arrange
+            var @event = CreateSomeEvent(_trackerUserOne.Id);
+            _mockEventRepository.Save(@event);
+            
+            // Act
+            _eventService.EditEvent(_userOne.Id, Guid.NewGuid(), new EventContent("2"));
+
+            // Assert
+            Assert.Pass();
+        }
+        
+        [Test]
+        public void DeleteEvent_UserDeletesOwnEvent_SuccessfullyDeleted()
+        {
+            // Arrange
+            var @event = CreateSomeEvent(_trackerUserOne.Id);
+            _mockEventRepository.Save(@event);
+            
+            // Act
+            _eventService.DeleteEvent(_userOne.Id, @event.Id);
+
+            // Assert
+            var eventsCount = _mockEventRepository.GetAll().Count();
             Assert.AreEqual(0, eventsCount);
+        }
+        
+        [Test]
+        public void DeleteEvent_UserDeletesSomeonesEvent_EventNotDeleted()
+        {
+            // Arrange
+            var @event = CreateSomeEvent(_trackerUserOne.Id);
+            _mockEventRepository.Save(@event);
+            
+            // Act
+            _eventService.DeleteEvent(_userTwo.Id, @event.Id);
+
+            // Assert
+            var eventsCount = _mockEventRepository.GetAll().Count();
+            Assert.AreEqual(1, eventsCount);
+        }
+        
+        [Test]
+        public void DeleteEvent_UserDeletesNotExistedEvent_NothingHappens()
+        {
+            // Arrange
+            var @event = CreateSomeEvent(_trackerUserOne.Id);
+            _mockEventRepository.Save(@event);
+            
+            // Act
+            _eventService.DeleteEvent(_userOne.Id, Guid.NewGuid());
+
+            // Assert
+            var eventsCount = _mockEventRepository.GetAll().Count();
+            Assert.AreEqual(1, eventsCount);
+        }
+        
+        private Fixture _fixture;
+        private IEventService _eventService;
+        private IRepository<User> _mockUserRepository;
+        private IRepository<Tracker> _mockTrackerRepository;
+        private IRepository<Event> _mockEventRepository;
+        private User _userOne;
+        private User _userTwo;
+        private Tracker _trackerUserOne;
+        private Tracker _trackerUserTwo;
+        
+        private Tracker CreateSomeTracker(Guid userId)
+        {
+            var trackerId = Guid.NewGuid();
+            return new Tracker(
+                trackerId, 
+                userId, 
+                $"{trackerId}", 
+                DateTime.Now, 
+                DateTime.Now, 
+                new System.Collections.Generic.HashSet<CustomizationType>());
+        }
+        
+        private Event CreateSomeEvent(Guid trackerId)
+        {
+            var eventId = Guid.NewGuid();
+            return new Event(
+                eventId, 
+                trackerId, 
+                $"{eventId}", 
+                DateTime.Now, 
+                DateTime.Now);
         }
     }
 }

@@ -19,20 +19,17 @@ namespace ItHappened.Application
             TrackerRepository = trackerRepository ?? throw new ArgumentNullException(nameof(trackerRepository));
         }
 
-        public Option<Event> CreateEvent(Guid actorId, Guid trackerId, EventContent eventContent)
+        public void CreateEvent(Guid actorId, Guid trackerId, EventContent eventContent)
         {
-            if (eventContent.IsNull()) return Option<Event>.None;
+            if (eventContent.IsNull()) return;
             var optionTracker = TrackerRepository.Get(trackerId);
-            var createdEvent = optionTracker.Map(tracker =>
+            optionTracker.Do(tracker =>
             {
-                if (actorId != tracker.UserId) return null;
+                if (actorId != tracker.UserId) return;
                 var eventId = Guid.NewGuid();
                 var @event = new Event(eventId, trackerId, eventContent.Title, DateTime.Now, DateTime.Now);
                 EventRepository.Save(@event);
-                return @event;
-            });
-            return createdEvent;
-        }
+            }); }
         
         public Option<Event> GetEvent(Guid actorId, Guid eventId)
         {
