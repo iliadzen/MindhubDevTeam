@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using ItHappened.Domain;
 using LanguageExt;
-using LanguageExt.Common;
 using LanguageExt.UnsafeValueAccess;
 using Serilog;
 
@@ -61,19 +60,21 @@ namespace ItHappened.Application
         public Option<Tracker> GetTracker(Guid actorId, Guid trackerId)
         {
             var optionTracker = _trackersRepository.Get(trackerId);
-            if (optionTracker.IsSome)
-                if (actorId != optionTracker.ValueUnsafe().UserId)
+            return optionTracker.Match(
+                Some: tracker =>
                 {
-                    Log.Error($"User {actorId} tried to get someone else's tracker");
+                    if (actorId != optionTracker.ValueUnsafe().UserId)
+                    {
+                        Log.Error($"User {actorId} tried to get someone else's tracker");
+                        return Option<Tracker>.None;
+                    }
+                    return tracker;
+                },
+                None: () =>
+                {
+                    Log.Error($"Tracker {trackerId} not exists");
                     return Option<Tracker>.None;
-                }
-                else
-                    return optionTracker;
-            else
-            {
-                Log.Error($"Tracker {trackerId} not exists");
-                return Option<Tracker>.None;
-            }
+                });
         }
 
         private readonly IRepository<Tracker> _trackersRepository;
