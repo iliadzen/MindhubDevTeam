@@ -2,7 +2,7 @@ using System;
 
 namespace ItHappened.Domain
 {
-    public class Event
+    public class Event : IEntity
     {
         public Guid Id { get; }
         public Guid TrackerId { get; }

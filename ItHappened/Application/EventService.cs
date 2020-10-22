@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using ItHappened.Domain;
-using ItHappened.Infrastructure;
 using LanguageExt;
 using LanguageExt.UnsafeValueAccess;
 
@@ -19,37 +19,48 @@ namespace ItHappened.Application
             TrackerRepository = trackerRepository ?? throw new ArgumentNullException(nameof(trackerRepository));
         }
 
-        public void CreateEvent(Guid actorId, Guid trackerId, EventContent eventContent)
+        public Option<Event> CreateEvent(Guid actorId, Guid trackerId, EventContent eventContent)
         {
-            if (eventContent.IsNull()) return;
+            if (eventContent.IsNull()) return Option<Event>.None;
             var optionTracker = TrackerRepository.Get(trackerId);
-            optionTracker.Do(tracker =>
+            var createdEvent = optionTracker.Map(tracker =>
             {
-                if (actorId != tracker.UserId) return;
+                if (actorId != tracker.UserId) return null;
                 var eventId = Guid.NewGuid();
                 var @event = new Event(eventId, trackerId, eventContent.Title, DateTime.Now, DateTime.Now);
                 EventRepository.Save(@event);
+                return @event;
             });
+            return createdEvent;
         }
         
         public Option<Event> GetEvent(Guid actorId, Guid eventId)
         {
             var optionEvent = EventRepository.Get(eventId);
-            return optionEvent.Match(
-                Some: @event =>
+            var @event = optionEvent.Match(
+                Some: e =>
                 {
-                    var optionTracker = TrackerRepository.Get(@event.TrackerId);
+                    var optionTracker = TrackerRepository.Get(e.TrackerId);
                     return optionTracker.Match(
-                        Some: tracker => actorId == tracker.UserId ? Option<Event>.None : optionEvent,
+                        Some: tracker => actorId == tracker.UserId ? optionEvent : Option<Event>.None,
                         None: Option<Event>.None);
                 },
                 None: Option<Event>.None);
+            return @event;
         }
 
-        public IReadOnlyCollection<Event> GetEventsByTrackerId(Guid trackerId)
+        public IReadOnlyCollection<Event> GetEventsByTrackerId(Guid actorId, Guid trackerId)
         {
-            return (IReadOnlyCollection<Event>) EventRepository.GetAll().Where(@event =>
-                @event.TrackerId == trackerId);
+            var optionTracker = TrackerRepository.Get(trackerId);
+            return optionTracker.Match(
+                Some: tracker => (tracker.UserId == actorId) 
+                    ? EventRepository
+                        .GetAll()
+                        .Where(@event => @event.TrackerId == trackerId)
+                        .ToList()
+                        .AsReadOnly()
+                    : new ReadOnlyCollection<Event>(new List<Event>()),
+                None: new ReadOnlyCollection<Event>(new List<Event>()));
         }
         
         public void EditEvent(Guid actorId, Guid eventId, EventContent eventContent)
