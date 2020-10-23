@@ -10,9 +10,10 @@ namespace ItHappened.Application
 {
     public class TrackerService : ITrackerService
     {
-        public TrackerService(IRepository<Tracker> trackersRepository)
+        public TrackerService(IRepository<Tracker> trackersRepository, IRepository<Event> eventsRepository)
         {
             _trackersRepository = trackersRepository;
+            _eventsRepository = eventsRepository;
         }
         public void CreateTracker(Guid actorId, TrackerForm form)
         {
@@ -54,8 +55,17 @@ namespace ItHappened.Application
                     Log.Error($"User {actorId} tried to delete someone else's tracker");
                     return;
                 }
+                DeleteTrackersEvents(trackerId);
                 _trackersRepository.Delete(trackerId);
             });
+        }
+
+        private void DeleteTrackersEvents(Guid trackerId)
+        {
+            var trackersEvents = _eventsRepository.GetAll()
+                .Where(@event => @event.TrackerId == trackerId).ToList().AsReadOnly();
+            foreach (var @event in trackersEvents)
+                _eventsRepository.Delete(@event.Id);
         }
         
         public IReadOnlyCollection<Tracker> GetUserTrackers(Guid userId)
@@ -85,5 +95,6 @@ namespace ItHappened.Application
         }
 
         private readonly IRepository<Tracker> _trackersRepository;
+        private readonly IRepository<Event> _eventsRepository;
     }
 }

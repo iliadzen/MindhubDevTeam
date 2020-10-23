@@ -4,6 +4,7 @@ using ItHappened.Application;
 using ItHappened.Domain;
 using NUnit.Framework;
 using System.Collections.Generic;
+using System.Linq;
 using LanguageExt.UnsafeValueAccess;
 
 namespace ItHappened.Tests
@@ -13,101 +14,122 @@ namespace ItHappened.Tests
         [SetUp]
         public void SetUp()
         {
-            _user = _fixture.Create<User>();
-            _trackerId = Guid.NewGuid();
-            _title = "Title";
+            _fixture = new Fixture();
+            _userId = Guid.NewGuid();
+            _someonesId = Guid.NewGuid();
+            _mockTrackerRepository = new RepositoryMock<Tracker>();
+            _mockEventRepository = new RepositoryMock<Event>();
             _customizations = _fixture.Create<ISet<CustomizationType>>();
-            _trackerService = new TrackerService(_mockTrackerRepository);
+            _trackerService = new TrackerService(_mockTrackerRepository, _mockEventRepository);
         }
         [Test]
-        public void UserGetsOwnTracker_GotTracker()
+        public void GetTracker_UserGetsOwnTracker_GotTracker()
         {
-            var userTracker = new Tracker(_trackerId, _user.Id, _title,
-                DateTime.Now, DateTime.Now, _customizations);
-            _mockTrackerRepository.Save(userTracker);
+            var userTracker = CreateSomeTracker(_userId);
 
-            var askedTracker = _trackerService.GetTracker(_user.Id, _trackerId);
+            var askedTracker = _trackerService.GetTracker(_userId, userTracker.Id);
             
             Assert.IsTrue(askedTracker.IsSome);
-            Assert.AreEqual(_title, askedTracker.ValueUnsafe().Title);
+            Assert.AreEqual(userTracker.Title, askedTracker.ValueUnsafe().Title);
         }
         
         [Test]
-        public void UserGetsSomeonesTracker_DidNotGetTracker()
+        public void GetTracker_UserGetsSomeonesTracker_DidNotGetTracker()
         {
-            var someonesTracker = new Tracker(_trackerId, Guid.NewGuid(), _title,
-                DateTime.Now, DateTime.Now, _customizations);
-            _mockTrackerRepository.Save(someonesTracker);
+            var someonesTracker = CreateSomeTracker(Guid.NewGuid());
 
-            var askedTracker = _trackerService.GetTracker(_user.Id, _trackerId);
+            var askedTracker = _trackerService.GetTracker(_userId, someonesTracker.Id);
 
             Assert.IsFalse(askedTracker.IsSome);
         }
 
         [Test]
-        public void UserEditsOwnTracker_TrackerWasEdited()
+        public void EditTracker_UserEditsOwnTracker_TrackerWasEdited()
         {
-            var userTracker = new Tracker(_trackerId, _user.Id, _title,
-                DateTime.Now, DateTime.Now, _customizations);
-            _mockTrackerRepository.Save(userTracker);
+            var userTracker = CreateSomeTracker(_userId);
             var trackerEditingForm = _fixture.Create<TrackerForm>();
             
-            _trackerService.EditTracker(_user.Id, _trackerId,  trackerEditingForm);
+            _trackerService.EditTracker(_userId, userTracker.Id,  trackerEditingForm);
             
-            var editedTracker = _trackerService.GetTracker(_user.Id, _trackerId);
-            Assert.IsTrue(editedTracker.IsSome);
-            Assert.AreEqual(trackerEditingForm.Title, editedTracker.ValueUnsafe().Title);
+            var trackers = _mockTrackerRepository.GetAll();
+            Assert.AreEqual(trackerEditingForm.Title, trackers.ElementAt(0).Title);
         }
         
         [Test]
-        public void UserEditsSomeonesTracker_TrackerWasNotEdited()
+        public void EditTracker_UserEditsSomeonesTracker_TrackerWasNotEdited()
         {
-            var someonesId = Guid.NewGuid();
-            var someonesTracker = new Tracker(_trackerId, someonesId, _title,
-                DateTime.Now, DateTime.Now, _customizations);
-            _mockTrackerRepository.Save(someonesTracker);
+            var someonesTracker = CreateSomeTracker(_someonesId);
             var trackerEditingForm = _fixture.Create<TrackerForm>();
             
-            _trackerService.EditTracker(_user.Id, _trackerId,  trackerEditingForm);
+            _trackerService.EditTracker(_userId, someonesTracker.Id,  trackerEditingForm);
             
-            var editedTracker = _trackerService.GetTracker(someonesId, _trackerId);
-            Assert.IsTrue(editedTracker.IsSome);
-            Assert.AreEqual(_title, editedTracker.ValueUnsafe().Title);
+            var trackers = _mockTrackerRepository.GetAll();
+            Assert.AreEqual(someonesTracker.Title, trackers.ElementAt(0).Title);
         }
         
         [Test]
-        public void UserDeletesOwnTracker_TrackerWasDeleted()
+        public void DeleteTracker_UserDeletesOwnTracker_TrackerAndItsEventsWereDeleted()
         {
-            var userTracker = new Tracker(_trackerId, _user.Id, _title,
-                DateTime.Now, DateTime.Now, _customizations);
-            _mockTrackerRepository.Save(userTracker);
+            var userTracker = CreateSomeTracker(_userId);
+            CreateSomeEvent(userTracker.Id);
+            CreateSomeEvent(userTracker.Id);
 
-            _trackerService.DeleteTracker(_user.Id, _trackerId);
+            _trackerService.DeleteTracker(_userId, userTracker.Id);
             
-            var deletedTracker = _trackerService.GetTracker(_user.Id, _trackerId);
-            Assert.IsFalse(deletedTracker.IsSome);
+            var trackers = _mockTrackerRepository.GetAll();
+            var events = _mockEventRepository.GetAll();
+            Assert.AreEqual(0, trackers.Count);
+            Assert.AreEqual(0, events.Count);
         }
         
         [Test]
-        public void UserDeletesSomeonesTracker_TrackerWasNotDeleted()
+        public void DeleteTracker_UserDeletesSomeonesTracker_TrackerAndItsEventsWereNotDeleted()
         {
-            var someonesId = Guid.NewGuid();
-            var someonesTracker = new Tracker(_trackerId, someonesId, _title,
-                DateTime.Now, DateTime.Now, _customizations);
-            _mockTrackerRepository.Save(someonesTracker);
+            var someonesTracker = CreateSomeTracker(_someonesId);
+            CreateSomeEvent(someonesTracker.Id);
+            CreateSomeEvent(someonesTracker.Id);
 
-            _trackerService.DeleteTracker(_user.Id, _trackerId);
+            _trackerService.DeleteTracker(_userId, someonesTracker.Id);
             
-            var deletedTracker = _trackerService.GetTracker(someonesId, _trackerId);
-            Assert.IsTrue(deletedTracker.IsSome);
-            Assert.AreEqual(_title, deletedTracker.ValueUnsafe().Title);
+            var trackers = _mockTrackerRepository.GetAll();
+            var events = _mockEventRepository.GetAll();
+            Assert.AreEqual(1, trackers.Count);
+            Assert.AreEqual(2, events.Count);
+            Assert.AreEqual(someonesTracker.Title, trackers.ElementAt(0).Title);
+        }
+        
+        private Tracker CreateSomeTracker(Guid userId)
+        {
+            var trackerId = Guid.NewGuid();
+            var tracker = new Tracker(
+                trackerId, 
+                userId, 
+                $"{trackerId}", 
+                DateTime.Now, 
+                DateTime.Now, 
+                _customizations);
+            _mockTrackerRepository.Save(tracker);
+            return tracker;
         }
 
-        private Fixture _fixture = new Fixture();
-        private RepositoryMock<Tracker> _mockTrackerRepository = new RepositoryMock<Tracker>();
-        private User _user;
-        private Guid _trackerId;
-        private string _title;
+        private Event CreateSomeEvent(Guid trackerId)
+        {
+            var eventId = Guid.NewGuid();
+            var @event = new Event(
+                eventId, 
+                trackerId, 
+                $"{eventId}", 
+                DateTime.Now, 
+                DateTime.Now);
+            _mockEventRepository.Save(@event);
+            return @event;
+        }
+
+        private Fixture _fixture;
+        private RepositoryMock<Tracker> _mockTrackerRepository;
+        private RepositoryMock<Event> _mockEventRepository;
+        private Guid _userId;
+        private Guid _someonesId;
         private ISet<CustomizationType> _customizations;
         private TrackerService _trackerService;
     }
