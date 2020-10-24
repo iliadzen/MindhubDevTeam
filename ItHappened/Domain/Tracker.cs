@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace ItHappened.Domain
 {
-    public class Tracker
+    public class Tracker : IEntity
     {
         public Guid Id { get; }
         public Guid UserId { get; }
