@@ -11,97 +11,120 @@ namespace ItHappened.Application
 {
     public class UserService
     {
-        private IRepository<User> _userRepository;
-        private IHasher _hasher;
-
         public UserService(IRepository<User> userRepository, IHasher hasher)
         {
             _userRepository = userRepository;
             _hasher = hasher;
         }
 
-        public Option<User> GetById(Guid actorId, Guid userId) =>
-            actorId == userId ? GetById(userId) : null;
-
-        public Option<User> GetByUsername(Guid actorId, string username) =>
-            _userRepository.GetAll().SingleOrDefault(user => user.Username == username && user.Id == actorId);
-
-        public Option<User> CreateUser(UserForm userForm)
+        public Option<User> GetUserById(Guid actorId, Guid userId)
         {
-            string intent = $"create new user named '{userForm.Username}'";
+            if (actorId == userId)
+                return _userRepository.Get(userId);
+            Log.Error($"User {actorId} tried to get {userId} account");
+            return Option<User>.None;
+        }
 
-            if (userForm.Username.IsNone || userForm.Password.IsNone)
+        public Option<User> GetUserByUsername(string username)
+        {
+            var users = _userRepository.GetAll().Where(user => user.Username == username);
+            if (users.Count() == 0)
             {
-                Log.Information($"Failed: {intent} - form incomplete");
+                Log.Error($"User {username} not exists");
                 return Option<User>.None;
             }
-            if (GetByUsername(userForm.Username.ValueUnsafe()).IsSome)
+
+            if (users.Count() == 2)
             {
-                Log.Information($"Failed: {intent} - username taken");
+                Log.Error($"Several users with same username {username} exists");
                 return Option<User>.None;
             }
-            User user = new User(Guid.NewGuid(),
-                userForm.Username.ValueUnsafe(), _hasher.MakeSaltedHash(userForm.Password.ValueUnsafe()),
-                new License(LicenseType.Free, DateTime.MaxValue), DateTime.Now, DateTime.Now);
-            
-            _userRepository.Save(user);
-            Log.Information($"Success: {intent}");
-            return user;
+
+            return users.FirstOrDefault();
+        }
+
+        public void CreateUser(UserForm form)
+        {
+            if (CheckFormIsComplete(form, "Creating"))
+            {
+                var user = new User(Guid.NewGuid(),
+                    form.Username, _hasher.MakeHash(form.Password),
+                    form.License, DateTime.Now, DateTime.Now);
+
+                _userRepository.Save(user);
+                Log.Information($"User {form.Username} with ID {user.Id} created");
+            }
         }
         
-        public Option<User> EditUser(Guid actorId, UserForm userForm)
+        public void EditUser(Guid actorId, Guid userId, UserForm form)
         {
-            string intent = $"edit user '{userForm.Id}'";
-            if (userForm.Id.IsNone)
+            if (actorId != userId)
             {
-                Log.Information($"Failed: {intent} - form incomplete");
-                return Option<User>.None;
+                Log.Error($"User {actorId} tried to edit {userId} account");
+                return;
             }
-            if (userForm.Id.ValueUnsafe() != actorId)
+            
+            if (CheckFormIsComplete(form, "Editing"))
             {
-                Log.Information($"Access denied: {intent}");
-                return Option<User>.None;
+                var oldUser = _userRepository.Get(userId);
+                oldUser.Do(user =>
+                {
+                    var newUser = new User(userId,
+                        form.Username, _hasher.MakeHash(form.Password),
+                        form.License, user.CreationDate, DateTime.Now);
+
+                    _userRepository.Update(newUser);
+                    Log.Information($"User {form.Username} with ID {newUser.Id} updated");
+                });
             }
-            Option<User> user = GetById(userForm.Id.ValueUnsafe());
-            user.Do(u =>
-            {
-                _userRepository.Save(u);
-                Log.Information($"Success: {intent}");
-            }); 
-            return user;
         }
 
-        public void SetPassword(Guid actorId, Guid userId, string oldPassword, string newPassword)
+        public void DeleteUser(Guid actorId, Guid userId)
         {
-            string intent = $"modify password for user '{userId}'";
-            Option<User> modifiedUser = GetById(userId);
-            if (!modifiedUser.Exists(user => 
-                    user.Id == actorId 
-                    && _hasher.VerifySaltedHash(oldPassword, user.PasswordHash)))
-                Log.Information($"Access denied: {intent}");
-
-            modifiedUser
-                .Do(user => user.PasswordHash = _hasher.MakeSaltedHash(newPassword))
-                .Do(user => user.ModificationDate = DateTime.Now);
-            Log.Information($"Success: {intent}");
+            if (actorId != userId)
+            {
+                Log.Error($"User {actorId} tried to delete {userId} account");
+                return;
+            }
+            _userRepository.Delete(userId);
         }
 
         public Option<User> LogInByCredentials(string username, string password)
         {
-            string intent = $"log in as user named '{username}'";
-            Option<User> user = GetByUsername(username);
-            if (!user.Exists(u => _hasher.VerifySaltedHash(password, u.PasswordHash)))
+            var user = GetUserByUsername(username);
+            if (user.IsNone)
+                return Option<User>.None;
+
+            if (_hasher.VerifyHash(password, user.ValueUnsafe().PasswordHash))
             {
-                Log.Information($"Access denied: {intent}");
+                Log.Information($"{username} inserted wrong password");
                 return Option<User>.None;
             }
             return user;
         }
+
+        private bool CheckFormIsComplete(UserForm form, string actionWithForm)
+        {
+            if (!form.IsNull())
+            {
+                if (form.Username.IsNull() || form.Password.IsNull() || form.License.IsNull())
+                {
+                    Log.Error($"{actionWithForm} user failed: form incomplete"); 
+                    return false;
+                }
+                
+                if (GetUserByUsername(form.Username).IsSome)
+                { 
+                    Log.Error($"{actionWithForm} user failed: username {form.Username} taken"); 
+                    return false; 
+                }
+                return true;
+            }
+            Log.Error($"{actionWithForm} user failed: form is null");
+            return false;
+        }
         
-        private Option<User> GetByUsername(string username) =>
-            _userRepository.GetAll().SingleOrDefault(user => user.Username == username);
-        
-        private Option<User> GetById(Guid userId) =>
-            _userRepository.Get(userId);
+        private readonly IRepository<User> _userRepository;
+        private readonly IHasher _hasher;
     }
 }

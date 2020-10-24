@@ -1,12 +1,20 @@
 ﻿using System;
+using ItHappened.Domain;
 using LanguageExt;
 
 namespace ItHappened.Application
 {
     public class UserForm
     {
-        public Option<Guid> Id { get; set; }
-        public Option<string> Username { get; set; }
-        public Option<string> Password { get; set; }
+        public string Username { get; }
+        public string Password { get; }
+        
+        public License License { get; }
+        public UserForm(string username, string password, License license)
+        {
+            Username = username;
+            Password = password;
+            License = license;
+        }
     }
 }

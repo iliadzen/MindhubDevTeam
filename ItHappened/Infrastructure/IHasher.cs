@@ -2,7 +2,7 @@
 {
     public interface IHasher
     {
-        string MakeSaltedHash(string source);
-        bool VerifySaltedHash(string source, string hash);
+        string MakeHash(string source);
+        bool VerifyHash(string source, string hash);
     }
 }
