@@ -2,7 +2,7 @@
 
 namespace ItHappened.Domain
 {
-    public class User
+    public class User : IEntity
     {
         public Guid Id { get; }
         public string Username { get; set; }

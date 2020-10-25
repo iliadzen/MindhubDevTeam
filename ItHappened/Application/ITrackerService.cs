@@ -1,15 +1,16 @@
 using System;
 using System.Collections.Generic;
 using ItHappened.Domain;
+using LanguageExt;
 
 namespace ItHappened.Application
 {
     public interface ITrackerService
     {
-        Guid CreateTracker(TrackerCreationContent content);
-        void EditTracker(Guid trackerId, TrackerCreationContent content);
-        void DeleteTracker(Guid userId, Guid trackerId);
+        void CreateTracker(Guid actorId, TrackerForm form);
+        void EditTracker(Guid actorId, Guid trackerId, TrackerForm form);
+        void DeleteTracker(Guid actorId, Guid trackerId);
         IReadOnlyCollection<Tracker> GetUserTrackers(Guid userId);
-        Tracker GetTracker(Guid trackerId);
+        Option<Tracker> GetTracker(Guid actorId, Guid trackerId);
     }
 }
