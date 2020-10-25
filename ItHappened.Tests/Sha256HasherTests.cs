@@ -1,5 +1,4 @@
-﻿using System;
-using ItHappened.Infrastructure;
+﻿using ItHappened.Infrastructure;
 using NUnit.Framework;
 
 namespace ItHappened.Tests
