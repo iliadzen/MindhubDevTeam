@@ -11,9 +11,10 @@ namespace ItHappened.Application
 {
     public class UserService
     {
-        public UserService(IRepository<User> userRepository, IHasher hasher)
+        public UserService(IRepository<User> userRepository, IRepository<Tracker> trackerRepository, IHasher hasher)
         {
             _userRepository = userRepository;
+            _trackerRepository = trackerRepository;
             _hasher = hasher;
         }
 
@@ -48,7 +49,7 @@ namespace ItHappened.Application
             if (CheckFormIsComplete(form, "Creating"))
             {
                 var user = new User(Guid.NewGuid(),
-                    form.Username, _hasher.MakeHash(form.Password),
+                    form.Username, _hasher.MakeSaltedHash(form.Password),
                     form.License, DateTime.Now, DateTime.Now);
 
                 _userRepository.Save(user);
@@ -70,7 +71,7 @@ namespace ItHappened.Application
                 oldUser.Do(user =>
                 {
                     var newUser = new User(userId,
-                        form.Username, _hasher.MakeHash(form.Password),
+                        form.Username, _hasher.MakeSaltedHash(form.Password),
                         form.License, user.CreationDate, DateTime.Now);
 
                     _userRepository.Update(newUser);
@@ -86,21 +87,32 @@ namespace ItHappened.Application
                 Log.Error($"User {actorId} tried to delete {userId} account");
                 return;
             }
+            DeleteUserTrackers(userId);
             _userRepository.Delete(userId);
         }
 
-        public Option<User> LogInByCredentials(string username, string password)
+        private void DeleteUserTrackers(Guid userId)
+        {
+            var usersTrackers = _trackerRepository.GetAll()
+                .Where(tracker => tracker.UserId == userId).ToList().AsReadOnly();
+            foreach (var tracker in usersTrackers)
+            {
+                _trackerRepository.Delete(tracker.Id);
+            }
+        }
+
+        public bool CheckPassword(string username, string password)
         {
             var user = GetUserByUsername(username);
             if (user.IsNone)
-                return Option<User>.None;
+                return false;
 
-            if (_hasher.VerifyHash(password, user.ValueUnsafe().PasswordHash))
+            if (!_hasher.VerifySaltedHash(password, user.ValueUnsafe().PasswordHash))
             {
                 Log.Information($"{username} inserted wrong password");
-                return Option<User>.None;
+                return false;
             }
-            return user;
+            return true;
         }
 
         private bool CheckFormIsComplete(UserForm form, string actionWithForm)
@@ -125,6 +137,7 @@ namespace ItHappened.Application
         }
         
         private readonly IRepository<User> _userRepository;
+        private readonly IRepository<Tracker> _trackerRepository;
         private readonly IHasher _hasher;
     }
 }
