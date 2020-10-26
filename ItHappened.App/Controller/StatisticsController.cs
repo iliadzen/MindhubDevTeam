@@ -1,7 +1,9 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ItHappened.App.Controller
 {
+    [Authorize]
     [Route("statistics")]
     public class StatisticsController : ControllerBase
     {

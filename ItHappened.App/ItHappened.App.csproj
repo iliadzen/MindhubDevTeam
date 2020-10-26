@@ -5,7 +5,12 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\ItHappened.Tests\ItHappened.Tests.csproj" />
       <ProjectReference Include="..\ItHappened\ItHappened.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.9" />
     </ItemGroup>
 
 </Project>

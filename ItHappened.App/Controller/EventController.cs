@@ -7,21 +7,21 @@ using Microsoft.AspNetCore.Mvc;
 namespace ItHappened.App.Controller
 {
     [Authorize]
-    [Route("trackers")]
-    public class TrackerController : ControllerBase
+    [Route("trackers/{trackerId}")]
+    public class EventController : ControllerBase
     {
         [HttpGet]
-        [Route("")]
-        public IActionResult GetTrackers()
+        [Route("events")]
+        public IActionResult GetEvents([FromRoute] Guid trackerId)
         {
             var userId = User.FindFirstValue(JwtClaimTypes.Id);
-
+            
             return Ok();
         }
         
         [HttpPost]
-        [Route("")]
-        IActionResult CreateTracker()
+        [Route("events")]
+        public IActionResult CreateEvent([FromBody] Guid trackerId)
         {
             var userId = User.FindFirstValue(JwtClaimTypes.Id);
 
@@ -29,8 +29,8 @@ namespace ItHappened.App.Controller
         }
         
         [HttpGet]
-        [Route("{trackerId}")]
-        IActionResult GetTracker([FromQuery] Guid trackerId)
+        [Route("events/{eventId}")]
+        public IActionResult GetEvent([FromQuery] Guid trackerId, [FromQuery] Guid eventId)
         {
             var userId = User.FindFirstValue(JwtClaimTypes.Id);
 
@@ -38,8 +38,8 @@ namespace ItHappened.App.Controller
         }
 
         [HttpPut]
-        [Route("{trackerId}")]
-        IActionResult UpdateTracker([FromQuery] Guid trackerId)
+        [Route("events/{eventId}")]
+        IActionResult UpdateEvent([FromQuery] Guid trackerId, [FromQuery] Guid eventId)
         {
             var userId = User.FindFirstValue(JwtClaimTypes.Id);
 
@@ -47,8 +47,8 @@ namespace ItHappened.App.Controller
         }
         
         [HttpDelete]
-        [Route("{trackerId}")]
-        IActionResult DeleteTracker([FromQuery] Guid trackerId)
+        [Route("events/{eventId}")]
+        IActionResult DeleteEvent([FromQuery] Guid trackerId, [FromQuery] Guid eventId)
         {
             var userId = User.FindFirstValue(JwtClaimTypes.Id);
 

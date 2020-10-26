@@ -1,3 +1,5 @@
+using System;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ItHappened.App.Controller
@@ -5,30 +7,33 @@ namespace ItHappened.App.Controller
     [Route("users")]
     public class UserController : ControllerBase
     {
+        [Authorize]
         [HttpGet]
         [Route("{userId}")]
-        IActionResult GetUser()
+        IActionResult GetUser([FromRoute] Guid userId)
         {
-            return Ok();
+            return Ok(userId);
         }
         
         [HttpPost]
         [Route("")]
-        IActionResult METHOD_TEMPLATE_POST()
+        IActionResult CreateUser()
         {
             return Ok();
         }
         
+        [Authorize]
         [HttpPut]
         [Route("{userId}")]
-        IActionResult UpdateUser()
+        IActionResult UpdateUser([FromRoute] Guid userId)
         {
             return Ok();
         }
         
+        [Authorize]
         [HttpDelete]
         [Route("{userId}")]
-        IActionResult UserDelete()
+        IActionResult UserDelete([FromRoute] Guid userId)
         {
             return Ok();
         }
