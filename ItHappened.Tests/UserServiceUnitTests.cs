@@ -152,25 +152,32 @@ namespace ItHappened.Tests
         }
 
         [Test]
-        public void LoginByCredentials_InsertedCorrectPassword_True()
+        public void LoginByCredentials_InsertedCorrectPassword_GotUser()
         {
             var user = EntityMaker.CreateSomeUser(_mockUserRepository);
 
-            Assert.IsTrue(_userService.CheckPassword(user.Username, user.PasswordHash));
+            var loggedUser = _userService.LogInByCredentials(user.Username, user.PasswordHash);
+
+            Assert.IsTrue(loggedUser.IsSome);
+            Assert.AreEqual(user.Username, loggedUser.ValueUnsafe().Username);
         }
         
         [Test]
-        public void CheckPassword_InsertedIncorrectPassword_False()
+        public void LoginByCredentials_InsertedIncorrectPassword_DidNotGetUser()
         {
             var user = EntityMaker.CreateSomeUser(_mockUserRepository);
 
-            Assert.IsFalse(_userService.CheckPassword(user.Username, "qwerty123"));
+            var loggedUser = _userService.LogInByCredentials(user.Username, "qwerty123");
+            
+            Assert.IsTrue(loggedUser.IsNone);
         }
         
         [Test]
-        public void CheckPassword_NoSuchUsername_False()
+        public void LoginByCredentials_NoSuchUsername_DidNotGetUser()
         {
-            Assert.IsFalse(_userService.CheckPassword("admin", "qwerty123"));
+            var loggedUser = _userService.LogInByCredentials("admin", "qwerty123");
+            
+            Assert.IsTrue(loggedUser.IsNone);
         }
 
         private Fixture _fixture;

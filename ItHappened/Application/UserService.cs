@@ -101,18 +101,18 @@ namespace ItHappened.Application
             }
         }
 
-        public bool CheckPassword(string username, string password)
+        public Option<User> LogInByCredentials(string username, string password)
         {
             var user = GetUserByUsername(username);
             if (user.IsNone)
-                return false;
+                return Option<User>.None;
 
             if (!_hasher.VerifySaltedHash(password, user.ValueUnsafe().PasswordHash))
             {
                 Log.Information($"{username} inserted wrong password");
-                return false;
+                return Option<User>.None;
             }
-            return true;
+            return user;
         }
 
         private bool CheckFormIsComplete(UserForm form, string actionWithForm)
