@@ -18,8 +18,6 @@ namespace ItHappened.App.Authentication
         
         public string GenerateToken(User user)
         {
-            Console.WriteLine("____________________-");
-            Console.WriteLine(_configuration.Secret);
             var claims = new[]
             {
                 new Claim(JwtClaimTypes.Id, user.Id.ToString()),
