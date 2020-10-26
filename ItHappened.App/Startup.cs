@@ -1,23 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using ItHappened.App.Authentication;
 using ItHappened.Domain;
-using ItHappened.Tests;
+using ItHappened.Infrastructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Moq;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 
 namespace ItHappened.App
@@ -53,9 +43,9 @@ namespace ItHappened.App
             // Services registration
             services.AddSingleton<IJwtIssuer, JwtIssuer>();
             
-            services.AddSingleton<IRepository<User>, RepositoryMock<User>>();
-            services.AddSingleton<IRepository<Tracker>, RepositoryMock<Tracker>>();
-            services.AddSingleton<IRepository<Event>, RepositoryMock<Event>>();
+            services.AddSingleton<IRepository<User>, InMemoryRepository<User>>();
+            services.AddSingleton<IRepository<Tracker>, InMemoryRepository<Tracker>>();
+            services.AddSingleton<IRepository<Event>, InMemoryRepository<Event>>();
             
             // Controllers registration
             services.AddControllers();
