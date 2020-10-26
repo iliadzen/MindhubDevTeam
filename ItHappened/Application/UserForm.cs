@@ -1,6 +1,4 @@
-using System;
 using ItHappened.Domain;
-using LanguageExt;
 
 namespace ItHappened.Application
 {
@@ -8,7 +6,7 @@ namespace ItHappened.Application
     {
         public string Username { get; }
         public string Password { get; }
-
+        
         public License License { get; }
         public UserForm(string username, string password, License license)
         {
