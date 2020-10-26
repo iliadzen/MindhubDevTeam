@@ -1,6 +1,4 @@
-﻿using System;
 using ItHappened.Domain;
-using LanguageExt;
 
 namespace ItHappened.Application
 {

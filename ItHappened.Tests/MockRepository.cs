@@ -35,9 +35,9 @@ namespace ItHappened.Tests
         public void Update(T newEntity)
         {
             Option<T> oldEntity = _repository.SingleOrDefault(entity => entity.Id == newEntity.Id);
-            oldEntity.Do(e =>
+            oldEntity.Do(entity =>
             {
-                _repository.Remove(e);
+                _repository.Remove(entity);
                 _repository.Add(newEntity);
             });
         }
