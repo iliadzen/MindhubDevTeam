@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using ItHappened.Domain;
 using LanguageExt;
@@ -71,7 +72,7 @@ namespace ItHappened.Application
         public IReadOnlyCollection<Tracker> GetUserTrackers(Guid userId)
         {
             var trackers = _trackersRepository.GetAll();
-            return (IReadOnlyCollection<Tracker>)trackers.Where(tracker => tracker.UserId == userId);
+            return trackers.Where(tracker => tracker.UserId == userId).ToList().AsReadOnly();
         }
 
         public Option<Tracker> GetTracker(Guid actorId, Guid trackerId)

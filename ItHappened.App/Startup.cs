@@ -51,7 +51,7 @@ namespace ItHappened.App
             services.AddSingleton<IHasher, Sha256Hasher>();
             
             services.AddSingleton<IUserService, UserService>();
-
+            services.AddSingleton<ITrackerService, TrackerService>();
             
             // Controllers registration
             services.AddControllers();
