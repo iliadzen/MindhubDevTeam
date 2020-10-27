@@ -17,7 +17,6 @@ namespace ItHappened.App.Controller
         public TrackerController(ITrackerService trackerService, IJwtIssuer jwtIssuer)
         {
             _trackerService = trackerService;
-            _jwtIssuer = jwtIssuer;
         }
         
         [Authorize]
@@ -57,26 +56,42 @@ namespace ItHappened.App.Controller
             var response = new List<TrackerGetResponse>();
             foreach (var tracker in trackers)
                 response.Add(new TrackerGetResponse(tracker));
-            return Ok(trackers);
+            return Ok(response);
         }
 
         [Authorize]
         [HttpPut]
         [Route("{trackerId}")]
-        public IActionResult UpdateTracker([FromQuery] Guid trackerId)
+        public IActionResult UpdateTracker([FromRoute] Guid trackerId, [FromBody] TrackerCreateRequest request)
         {
-            throw new NotImplementedException();
+            var actorId = Guid.Parse(User.FindFirstValue(JwtClaimTypes.Id));
+            var optionTracker = _trackerService.GetTracker(actorId, trackerId);
+            return optionTracker.Match<IActionResult>(
+                Some: tracker =>
+                {
+                    var form = new TrackerForm(request.Title, new HashSet<CustomizationType>());
+                    _trackerService.EditTracker(actorId, trackerId, form);
+                    return Ok();
+                },
+                None: NotFound("Tracker doesn't exist or no permissions to edit"));
         }
         
         [Authorize]
         [HttpDelete]
         [Route("{trackerId}")]
-        public IActionResult DeleteTracker([FromQuery] Guid trackerId)
+        public IActionResult DeleteTracker([FromRoute] Guid trackerId)
         {
-            throw new NotImplementedException();
+            var actorId = Guid.Parse(User.FindFirstValue(JwtClaimTypes.Id));
+            var optionTracker = _trackerService.GetTracker(actorId, trackerId);
+            return optionTracker.Match<IActionResult>(
+                Some: tracker =>
+                {
+                    _trackerService.DeleteTracker(actorId, trackerId);
+                    return Ok();
+                },
+                None: NotFound("Tracker doesn't exist or no permissions to delete"));
         }
         
         private readonly ITrackerService _trackerService;
-        private readonly IJwtIssuer _jwtIssuer;
     }
 }
