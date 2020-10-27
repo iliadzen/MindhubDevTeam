@@ -25,7 +25,7 @@ namespace ItHappened.Tests
         [Test]
         public void GetTracker_UserGetsOwnTracker_GotTracker()
         {
-            var userTracker = CreateSomeTracker(_userId);
+            var userTracker = EntityMaker.CreateSomeTracker(_userId, _mockTrackerRepository);
 
             var askedTracker = _trackerService.GetTracker(_userId, userTracker.Id);
             
@@ -36,7 +36,7 @@ namespace ItHappened.Tests
         [Test]
         public void GetTracker_UserGetsSomeonesTracker_DidNotGetTracker()
         {
-            var someonesTracker = CreateSomeTracker(Guid.NewGuid());
+            var someonesTracker = EntityMaker.CreateSomeTracker(Guid.NewGuid(), _mockTrackerRepository);
 
             var askedTracker = _trackerService.GetTracker(_userId, someonesTracker.Id);
 
@@ -46,7 +46,7 @@ namespace ItHappened.Tests
         [Test]
         public void EditTracker_UserEditsOwnTracker_TrackerWasEdited()
         {
-            var userTracker = CreateSomeTracker(_userId);
+            var userTracker = EntityMaker.CreateSomeTracker(_userId, _mockTrackerRepository);
             var trackerEditingForm = _fixture.Create<TrackerForm>();
             
             _trackerService.EditTracker(_userId, userTracker.Id,  trackerEditingForm);
@@ -58,7 +58,7 @@ namespace ItHappened.Tests
         [Test]
         public void EditTracker_UserEditsSomeonesTracker_TrackerWasNotEdited()
         {
-            var someonesTracker = CreateSomeTracker(_someonesId);
+            var someonesTracker = EntityMaker.CreateSomeTracker(_someonesId, _mockTrackerRepository);
             var trackerEditingForm = _fixture.Create<TrackerForm>();
             
             _trackerService.EditTracker(_userId, someonesTracker.Id,  trackerEditingForm);
@@ -70,24 +70,26 @@ namespace ItHappened.Tests
         [Test]
         public void DeleteTracker_UserDeletesOwnTracker_TrackerAndItsEventsWereDeleted()
         {
-            var userTracker = CreateSomeTracker(_userId);
-            CreateSomeEvent(userTracker.Id);
-            CreateSomeEvent(userTracker.Id);
+            var userTracker = EntityMaker.CreateSomeTracker(_userId, _mockTrackerRepository);
+            EntityMaker.CreateSomeTracker(_someonesId, _mockTrackerRepository);
+            EntityMaker.CreateSomeEvent(userTracker.Id, _mockEventRepository);
+            EntityMaker.CreateSomeEvent(userTracker.Id, _mockEventRepository);
+            EntityMaker.CreateSomeEvent(_someonesId, _mockEventRepository);
 
             _trackerService.DeleteTracker(_userId, userTracker.Id);
             
             var trackers = _mockTrackerRepository.GetAll();
             var events = _mockEventRepository.GetAll();
-            Assert.AreEqual(0, trackers.Count);
-            Assert.AreEqual(0, events.Count);
+            Assert.AreEqual(1, trackers.Count);
+            Assert.AreEqual(1, events.Count);
         }
         
         [Test]
         public void DeleteTracker_UserDeletesSomeonesTracker_TrackerAndItsEventsWereNotDeleted()
         {
-            var someonesTracker = CreateSomeTracker(_someonesId);
-            CreateSomeEvent(someonesTracker.Id);
-            CreateSomeEvent(someonesTracker.Id);
+            var someonesTracker = EntityMaker.CreateSomeTracker(_someonesId, _mockTrackerRepository);
+            EntityMaker.CreateSomeEvent(someonesTracker.Id, _mockEventRepository);
+            EntityMaker.CreateSomeEvent(someonesTracker.Id, _mockEventRepository);
 
             _trackerService.DeleteTracker(_userId, someonesTracker.Id);
             
@@ -97,32 +99,15 @@ namespace ItHappened.Tests
             Assert.AreEqual(2, events.Count);
             Assert.AreEqual(someonesTracker.Title, trackers.ElementAt(0).Title);
         }
-        
-        private Tracker CreateSomeTracker(Guid userId)
-        {
-            var trackerId = Guid.NewGuid();
-            var tracker = new Tracker(
-                trackerId, 
-                userId, 
-                $"{trackerId}", 
-                DateTime.Now, 
-                DateTime.Now, 
-                _customizations);
-            _mockTrackerRepository.Save(tracker);
-            return tracker;
-        }
 
-        private Event CreateSomeEvent(Guid trackerId)
+        [Test]
+        public void GetUserTrackers_UserGetsOwnTrackers_GotTrackers()
         {
-            var eventId = Guid.NewGuid();
-            var @event = new Event(
-                eventId, 
-                trackerId, 
-                $"{eventId}", 
-                DateTime.Now, 
-                DateTime.Now);
-            _mockEventRepository.Save(@event);
-            return @event;
+            var tracker = EntityMaker.CreateSomeTracker(_userId, _mockTrackerRepository);
+
+            var trackers = _trackerService.GetUserTrackers(_userId);
+            
+            Assert.AreEqual(tracker.Title, trackers.ElementAt(0).Title);
         }
 
         private Fixture _fixture;

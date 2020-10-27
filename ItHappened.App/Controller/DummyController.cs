@@ -8,13 +8,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ItHappened.App.Controller
 {
-    /// <summary>
-    /// Example of controller, that can auth user
-    /// </summary>
+    [Route("dummy")]
     public class DummyController : ControllerBase
     {
         private readonly IJwtIssuer _jwtIssuer;
-
         public DummyController(IJwtIssuer jwtIssuer)
         {
             _jwtIssuer = jwtIssuer ?? throw new ArgumentNullException(nameof(jwtIssuer));
@@ -25,7 +22,7 @@ namespace ItHappened.App.Controller
         public IActionResult TestPost([FromBody] LoginRequest request)
         {
             var user = new User(
-                request.UserId, 
+                Guid.NewGuid(), 
                 "silkslime", 
                 "lalala",
                 new License(LicenseType.Premium, DateTime.Now),
@@ -35,7 +32,7 @@ namespace ItHappened.App.Controller
             var token = _jwtIssuer.GenerateToken(user);
             return Ok(token);
         }
-
+        
         [Authorize]
         [HttpGet]
         [Route("")]

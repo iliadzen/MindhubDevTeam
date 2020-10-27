@@ -1,5 +1,6 @@
 using System.Text;
 using ItHappened.App.Authentication;
+using ItHappened.Application;
 using ItHappened.Domain;
 using ItHappened.Infrastructure;
 using Microsoft.AspNetCore.Builder;
@@ -46,6 +47,11 @@ namespace ItHappened.App
             services.AddSingleton<IRepository<User>, InMemoryRepository<User>>();
             services.AddSingleton<IRepository<Tracker>, InMemoryRepository<Tracker>>();
             services.AddSingleton<IRepository<Event>, InMemoryRepository<Event>>();
+
+            services.AddSingleton<IHasher, Sha256Hasher>();
+            
+            services.AddSingleton<IUserService, UserService>();
+            services.AddSingleton<ITrackerService, TrackerService>();
             
             // Controllers registration
             services.AddControllers();
