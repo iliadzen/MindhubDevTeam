@@ -9,7 +9,7 @@ using Serilog;
 
 namespace ItHappened.Application
 {
-    public class UserService
+    public class UserService : IUserService
     {
         public UserService(IRepository<User> userRepository, IRepository<Tracker> trackerRepository, IHasher hasher)
         {
