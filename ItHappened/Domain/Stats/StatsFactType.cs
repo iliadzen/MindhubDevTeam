@@ -1,4 +1,4 @@
-﻿namespace ItHappened.Domain
+﻿namespace ItHappened.Domain.Stats
 {
     public enum StatsFactType
     {
