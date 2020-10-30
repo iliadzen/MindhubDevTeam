@@ -4,12 +4,12 @@ namespace ItHappened.Domain
 {
     public class User : IEntity
     {
-        public Guid Id { get; }
-        public string Username { get; }
-        public string PasswordHash { get; }
-        public License License { get; }
-        public DateTime CreationDate { get; }
-        public DateTime ModificationDate { get; }
+        public Guid Id { get; set; }
+        public string Username { get; set; }
+        public string PasswordHash { get; set; }
+        public License License { get; set; }
+        public DateTime CreationDate { get; set; }
+        public DateTime ModificationDate { get; set; }
 
         public User(Guid id, string username, string passwordHash, License license,
             DateTime creationDate, DateTime modificationDate)
@@ -20,6 +20,10 @@ namespace ItHappened.Domain
             License = license;
             CreationDate = creationDate;
             ModificationDate = modificationDate;
+        }
+
+        public User()
+        {
         }
     }
 }

@@ -6,6 +6,7 @@ using ItHappened.Application;
 using ItHappened.Domain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 
 namespace ItHappened.App.Controller
 {
@@ -55,8 +56,9 @@ namespace ItHappened.App.Controller
         [Route("signup")]
         public IActionResult CreateUser([FromBody] UserCreateRequest userCreateRequest)
         {
-            var userForm = new UserForm(userCreateRequest.Username, userCreateRequest.Password, new License());
+            var userForm = new UserForm(userCreateRequest.Username, userCreateRequest.Password);
             _userService.CreateUser(userForm);
+            
             var optionUser = _userService.LogInByCredentials(userForm.Username, userForm.Password);
 
             return optionUser.Match(
@@ -76,12 +78,12 @@ namespace ItHappened.App.Controller
         {
             var actorId = Guid.Parse(User.FindFirstValue(JwtClaimTypes.Id));
             var optionUser = _userService.GetUserById(actorId,actorId);
-            return optionUser.Match(
+            return optionUser.Match<IActionResult>(
                 Some: user =>
                 {
-                    var userForm = new UserForm(userUpdateRequest.Username, userUpdateRequest.Password, user.License);
+                    var userForm = new UserForm(userUpdateRequest.Username, userUpdateRequest.Password);
                     _userService.EditUser(actorId, actorId, userForm);
-                    return Ok("Success!");
+                    return Ok("Check your page to view results!!");
                 }, 
                 None: Ok("Error! :("));
         }

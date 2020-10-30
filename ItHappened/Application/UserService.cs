@@ -50,7 +50,7 @@ namespace ItHappened.Application
             {
                 var user = new User(Guid.NewGuid(),
                     form.Username, _hasher.MakeSaltedHash(form.Password),
-                    form.License, DateTime.Now, DateTime.Now);
+                    new License(), DateTime.Now, DateTime.Now);
 
                 _userRepository.Save(user);
                 Log.Information($"User {form.Username} with ID {user.Id} created");
@@ -70,12 +70,10 @@ namespace ItHappened.Application
                 var oldUser = _userRepository.Get(userId);
                 oldUser.Do(user =>
                 {
-                    var newUser = new User(userId,
-                        form.Username, _hasher.MakeSaltedHash(form.Password),
-                        form.License, user.CreationDate, DateTime.Now);
-
-                    _userRepository.Update(newUser);
-                    Log.Information($"User {form.Username} with ID {newUser.Id} updated");
+                    user.Username = form.Username;
+                    user.PasswordHash = _hasher.MakeSaltedHash(form.Password);
+                    _userRepository.Update(user);
+                    Log.Information($"User {form.Username} with ID {user.Id} updated");
                 });
             }
         }
@@ -103,6 +101,7 @@ namespace ItHappened.Application
 
         public Option<User> LogInByCredentials(string username, string password)
         {
+            
             var user = GetUserByUsername(username);
             if (user.IsNone)
                 return Option<User>.None;
@@ -119,7 +118,7 @@ namespace ItHappened.Application
         {
             if (!form.IsNull())
             {
-                if (form.Username.IsNull() || form.Password.IsNull() || form.License.IsNull())
+                if (form.Username.IsNull() || form.Password.IsNull())
                 {
                     Log.Error($"{actionWithForm} user failed: form incomplete"); 
                     return false;
