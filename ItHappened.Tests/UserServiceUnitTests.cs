@@ -2,7 +2,6 @@ using System;
 using AutoFixture;
 using ItHappened.Application;
 using ItHappened.Domain;
-using ItHappened.Infrastructure;
 using LanguageExt.UnsafeValueAccess;
 using NUnit.Framework;
 

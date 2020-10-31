@@ -1,5 +1,3 @@
-using ItHappened.Domain;
-
 namespace ItHappened.App.Model
 {
     public class UserCreateRequest

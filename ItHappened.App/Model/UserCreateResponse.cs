@@ -1,5 +1,3 @@
-using System.Reflection;
-
 namespace ItHappened.App.Model
 {
     public class UserCreateResponse

@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using ItHappened.Domain;
 using LanguageExt;
-using LanguageExt.UnsafeValueAccess;
 
 namespace ItHappened.Application
 {
