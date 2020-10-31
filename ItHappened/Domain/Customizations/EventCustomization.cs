@@ -4,11 +4,13 @@ using Serilog;
 
 namespace ItHappened.Domain
 {
-    public class EventCustomization
+    public class EventCustomization : IEntity
     {
+        public Guid Id { get; }
         public Guid EventId { get; }
-        public EventCustomization(Guid eventId, EventCustomizationData customization)
+        public EventCustomization(Guid id, Guid eventId, EventCustomizationData customization)
         {
+            Id = id;
             EventId = eventId;
             _customizations.Add(customization);
         }

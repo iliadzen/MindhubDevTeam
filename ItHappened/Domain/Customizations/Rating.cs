@@ -1,6 +1,6 @@
 namespace ItHappened.Domain
 {
-    public class EventRating : EventCustomizationData
+    public class Rating : EventCustomizationData
     {
         public enum StarsRating
         {
@@ -11,11 +11,11 @@ namespace ItHappened.Domain
             Five = 5
         }
 
-        public StarsRating Rating { get; }
+        public StarsRating Stars { get; }
 
-        public EventRating(StarsRating rating)
+        public Rating(StarsRating stars)
         {
-            Rating = rating;
+            Stars = stars;
         }
     }
 }
