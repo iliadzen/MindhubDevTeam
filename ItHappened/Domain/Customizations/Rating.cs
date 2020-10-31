@@ -1,6 +1,9 @@
-namespace ItHappened.Domain
+using System;
+using ItHappened.Domain.Customizations;
+
+namespace ItHappened.Domain.Customizations
 {
-    public class Rating : EventCustomizationData
+    public class Rating : IEntity, IEventCustomizationData
     {
         public enum StarsRating
         {
@@ -10,11 +13,15 @@ namespace ItHappened.Domain
             Four = 4,
             Five = 5
         }
-
+        
+        public Guid Id { get; }
+        public Guid EventId  { get; }
         public StarsRating Stars { get; }
 
-        public Rating(StarsRating stars)
+        public Rating(Guid id, Guid eventId, StarsRating stars)
         {
+            Id = id;
+            EventId = eventId;
             Stars = stars;
         }
     }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using ItHappened.Domain;
+using ItHappened.Domain.Customizations;
 using LanguageExt;
 using Serilog;
 
@@ -9,31 +10,26 @@ namespace ItHappened.Application
     public class CustomizationService : ICustomizationService
     {
         public CustomizationService(IRepository<Tracker> trackerRepository, IRepository<Event> eventRepository,
-            IRepository<EventCustomization> eventCustomizationRepository)
+            IRepository<Comment> commentRepository)
         {
             _trackerRepository = trackerRepository;
             _eventRepository = eventRepository;
-            _eventCustomizationRepository = eventCustomizationRepository;
+            _commentRepository = commentRepository;
         }
-        
-        public void AddEventCustomizationData(Guid actorId, Guid eventId, EventCustomizationData data)
+
+        public void AddCommentToEvent(Guid actorId, Guid eventId, CommentForm form)
         {
-            var optionCustomization = GetEventCustomizationByEventId(actorId, eventId);
-            optionCustomization.Do(eventData =>
+            if (!form.IsNull())
             {
-                var optionTracker = GetTrackerByEventId(eventId);
-                optionTracker.Do(tracker =>
+                if (!string.IsNullOrEmpty(form.Content))
                 {
-                    if (CheckTrackerHasCustomizationOfSuchDataType(tracker.Customizations, data))
-                    {
-                        eventData.AddCustomization(data);
-                        Log.Information($"Customization {data.ToString()} added to {eventId}");
-                    }
-                    else
-                        Log.Error($"Tracker {tracker.Id} doesn't have customization" +
-                                  $"{data.ToString()} to add it to {eventId}");
-                });
-            });
+                    var comment = new Comment(Guid.NewGuid(), eventId, form.Content, DateTime.Now);
+                    AddEventCustomizationData(actorId, eventId, comment, _commentRepository);
+                }
+                Log.Error("Content of comment is null or empty");
+            }
+            else
+                Log.Error("Comment form is null");
         }
 
         public void AddTrackerCustomization(Guid actorId, Guid trackerId, CustomizationType type)
@@ -58,29 +54,20 @@ namespace ItHappened.Application
                         $"User {actorId} tried to customize tracker of user {tracker.UserId}");
             });
         }
-
-        public Option<EventCustomization> GetEventCustomizationByEventId(Guid actorId, Guid eventId)
+        
+        public bool CheckTrackerHasCustomizationOfSuchDataType(IEnumerable<CustomizationType> customizations,
+            IEventCustomizationData data)
         {
-            var optionEvent = _eventRepository.Get(eventId);
-            return optionEvent.Match(
-                Some: @event =>
-                {
-                    if (actorId == @event.Id)
-                    {
-                        var eventDatas = _eventCustomizationRepository.GetAll();
-                        foreach (var eventData in eventDatas)
-                        {
-                            if (eventData.EventId == eventId)
-                                return eventData;
-                        }
-                        return Option<EventCustomization>.None;
-                    }
-                    return Option<EventCustomization>.None;
-                },
-                None: Option<EventCustomization>.None);
+            foreach (var customization in customizations)
+            {
+                var dataString = data.ToString().Split('.');
+                if (customization.ToString() == dataString[dataString.Length - 1])
+                    return true;
+            }
+            return false;
         }
-
-        public Option<Tracker> GetTrackerByEventId(Guid eventId)
+        
+        private Option<Tracker> GetTrackerByEventId(Guid eventId)
         {
             var optionEvent = _eventRepository.Get(eventId);
             return optionEvent.Match(
@@ -96,21 +83,55 @@ namespace ItHappened.Application
                 },
                 None: Option<Tracker>.None);
         }
-
-        public bool CheckTrackerHasCustomizationOfSuchDataType(ISet<CustomizationType> customizations,
-            EventCustomizationData data)
+        
+        private void AddEventCustomizationData<T>(Guid actorId, Guid eventId, T data, IRepository<T> repository) 
+            where T : IEventCustomizationData
         {
-            foreach (var customization in customizations)
+            var optionTracker = GetTrackerByEventId(eventId);
+            optionTracker.Do(tracker =>
             {
-                var dataString = data.ToString().Split('.');
-                if (customization.ToString() == dataString[dataString.Length - 1])
+                if (actorId == tracker.UserId)
+                {
+                    var splittedStringType = data.ToString().Split('.');
+                    var customizationType = splittedStringType[splittedStringType.Length - 1];
+                    if (CheckTrackerHasCustomizationOfSuchDataType(tracker.Customizations, data))
+                    {
+                        if (!CheckEventCustomizationDataOfSuchTypeAddedToEvent(eventId, _commentRepository))
+                        {
+                            repository.Save(data);
+                            Log.Information($"Customization {customizationType} " +
+                                            $"added to {eventId}");
+                        }
+                        else
+                            Log.Error($"Event {eventId} already has customization of " +
+                                      $"{customizationType} type");
+                    }
+                    else
+                    {
+                        Log.Error($"Tracker {tracker.Id} doesn't have customization" +
+                                  $"{customizationType} to add it to {eventId}");
+                    }
+                }
+                else
+                    Log.Information(
+                        $"User {actorId} tried to customize event of user {tracker.UserId}");
+            });
+        }
+
+        public bool CheckEventCustomizationDataOfSuchTypeAddedToEvent<T>(Guid eventId, IRepository<T> repository)
+        where T : IEventCustomizationData
+        {
+            var eventDatas = repository.GetAll();
+            foreach (var eventData in eventDatas)
+            {
+                if (eventData.EventId == eventId)
                     return true;
             }
             return false;
         }
-
+        
         private readonly IRepository<Tracker> _trackerRepository;
         private readonly IRepository<Event> _eventRepository;
-        private readonly IRepository<EventCustomization> _eventCustomizationRepository;
+        private readonly IRepository<Comment> _commentRepository;
     }
 }

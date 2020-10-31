@@ -1,11 +1,18 @@
-namespace ItHappened.Domain
+using System;
+using ItHappened.Domain.Customizations;
+
+namespace ItHappened.Domain.Customizations
 {
-    public class Photo : EventCustomizationData
+    public class Photo : IEntity, IEventCustomizationData
     {
+        public Guid Id { get; }
+        public Guid EventId  { get; }
         public byte[] File { get;  }
 
-        public Photo(string name, byte[] file)
+        public Photo(Guid id, Guid eventId, string name, byte[] file)
         {
+            Id = id;
+            EventId = eventId;
             File = file;
         }
     }
