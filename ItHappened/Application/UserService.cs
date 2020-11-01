@@ -49,8 +49,7 @@ namespace ItHappened.Application
             if (CheckFormIsComplete(form, "Creating"))
             {
                 var user = new User(Guid.NewGuid(),
-                    form.Username, _hasher.MakeSaltedHash(form.Password),
-                    new License(), DateTime.Now, DateTime.Now);
+                    form.Username, _hasher.MakeSaltedHash(form.Password),DateTime.Now, DateTime.Now);
 
                 _userRepository.Save(user);
                 Log.Information($"User {form.Username} with ID {user.Id} created");

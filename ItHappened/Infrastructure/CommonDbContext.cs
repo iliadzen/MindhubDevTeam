@@ -23,7 +23,6 @@ namespace ItHappened.Infrastructure
             modelBuilder.Entity<User>(builder =>
             {
                 builder.ToTable("Users", "ItHappened");
-                builder.HasOne(user => user.License).WithOne().OnDelete(DeleteBehavior.Cascade).HasForeignKey<User>("LicenseId").OnDelete(DeleteBehavior.Cascade);
             });
         }
     }

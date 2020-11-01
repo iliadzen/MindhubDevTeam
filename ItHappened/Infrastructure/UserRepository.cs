@@ -25,12 +25,12 @@ namespace ItHappened.Infrastructure
 
         public Option<User> Get(Guid id)
         {
-            return Option<User>.Some(_context.Users.Include(_ => _.License).SingleOrDefault(_ => _.Id == id));
+            return Option<User>.Some(_context.Users.SingleOrDefault(_ => _.Id == id));
         }
 
         public IReadOnlyCollection<User> GetAll()
         {
-            return !_context.Users.Any() ? new List<User>() : _context.Users.Include(_ => _.License).ToList();
+            return !_context.Users.Any() ? new List<User>() : _context.Users.ToList();
         }
 
         public void Update(User entity)
