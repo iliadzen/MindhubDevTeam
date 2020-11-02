@@ -1,6 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Security.Claims;
 using ItHappened.App.Authentication;
+using ItHappened.App.Model;
+using ItHappened.Application;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,49 +13,101 @@ namespace ItHappened.App.Controller
     [Route("trackers/{trackerId}")]
     public class EventController : ControllerBase
     {
-        [HttpGet]
-        [Route("events")]
-        public IActionResult GetEvents([FromRoute] Guid trackerId)
+        public EventController(IEventService eventService)
         {
-            var userId = User.FindFirstValue(JwtClaimTypes.Id);
-            
-            return Ok();
+            _eventService = eventService;
         }
         
         [HttpPost]
         [Route("events")]
-        public IActionResult CreateEvent([FromBody] Guid trackerId)
+        public IActionResult CreateEvent([FromRoute] Guid trackerId, [FromBody] EventCreateRequest request)
         {
-            var userId = User.FindFirstValue(JwtClaimTypes.Id);
-
+            var actorId = Guid.Parse(User.FindFirstValue(JwtClaimTypes.Id));
+            var form = new EventContent(request.Title);
+            _eventService.CreateEvent(actorId, trackerId, form);
             return Ok();
         }
         
         [HttpGet]
-        [Route("events/{eventId}")]
-        public IActionResult GetEvent([FromQuery] Guid trackerId, [FromQuery] Guid eventId)
+        [Route("events")]
+        public IActionResult GetEvents([FromRoute] Guid trackerId)
         {
-            var userId = User.FindFirstValue(JwtClaimTypes.Id);
-
-            return Ok();
+            var actorId = Guid.Parse(User.FindFirstValue(JwtClaimTypes.Id));
+            var events = _eventService.GetEventsByTrackerId(actorId, trackerId);
+            var response = new List<EventGetResponse>();
+            foreach (var @event in events)
+                response.Add(new EventGetResponse(@event));
+            
+            return Ok(response);
         }
 
+        [HttpGet]
+        [Route("events/{eventId}")]
+        public IActionResult GetEvent([FromRoute] Guid eventId)
+        {
+            var actorId = Guid.Parse(User.FindFirstValue(JwtClaimTypes.Id));
+            var optionEvent = _eventService.GetEvent(actorId, eventId);
+            return optionEvent.Match<IActionResult>(
+                Some: @event =>
+                {
+                    var response = new EventGetResponse(@event);
+                    return Ok(response);
+                },
+                None: Ok(new
+                    {
+                        errors = new
+                        {
+                            commonError = "Event doesn't exist or no permissions to get."
+                        }
+                    }
+                ));
+        }
+        
         [HttpPut]
         [Route("events/{eventId}")]
-        IActionResult UpdateEvent([FromQuery] Guid trackerId, [FromQuery] Guid eventId)
+        public IActionResult UpdateEvent([FromRoute] Guid eventId, [FromBody] EventCreateRequest request)
         {
-            var userId = User.FindFirstValue(JwtClaimTypes.Id);
-
-            return Ok();
+            var actorId = Guid.Parse(User.FindFirstValue(JwtClaimTypes.Id));
+            var optionEvent = _eventService.GetEvent(actorId, eventId);
+            return optionEvent.Match<IActionResult>(
+                Some: tracker =>
+                {
+                    var form = new EventContent(request.Title);
+                    _eventService.EditEvent(actorId, eventId, form);
+                    return Ok();
+                },
+                None: Ok(new
+                    {
+                        errors = new
+                        {
+                            commonError = "Event doesn't exist or no permissions to edit."
+                        }
+                    }
+                ));
         }
         
         [HttpDelete]
         [Route("events/{eventId}")]
-        IActionResult DeleteEvent([FromQuery] Guid trackerId, [FromQuery] Guid eventId)
+        public IActionResult DeleteEvent([FromRoute] Guid eventId)
         {
-            var userId = User.FindFirstValue(JwtClaimTypes.Id);
-
-            return Ok();
+            var actorId = Guid.Parse(User.FindFirstValue(JwtClaimTypes.Id));
+            var optionEvent = _eventService.GetEvent(actorId, eventId);
+            return optionEvent.Match<IActionResult>(
+                Some: @event =>
+                {
+                    _eventService.DeleteEvent(actorId, eventId);
+                    return Ok();
+                },
+                None: Ok(new
+                    {
+                        errors = new
+                        {
+                            commonError = "Event doesn't exist or no permissions to delete."
+                        }
+                    }
+                ));
         }
+
+        private readonly IEventService _eventService;
     }
 }

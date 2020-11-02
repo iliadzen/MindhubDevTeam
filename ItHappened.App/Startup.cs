@@ -3,6 +3,7 @@ using ItHappened.App.Authentication;
 using ItHappened.App.Filters;
 using ItHappened.Application;
 using ItHappened.Domain;
+using ItHappened.Domain.Customizations;
 using ItHappened.Infrastructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -61,13 +62,15 @@ namespace ItHappened.App
             // services.AddSingleton<IRepository<User>, InMemoryRepository<User>>();
             services.AddSingleton<IRepository<Tracker>, InMemoryRepository<Tracker>>();
             services.AddSingleton<IRepository<Event>, InMemoryRepository<Event>>();
+            services.AddSingleton<IRepository<Comment>, InMemoryRepository<Comment>>();
             services.AddScoped<SaveChangesFilter>();
-            
             
             services.AddScoped<IHasher, Sha256Hasher>();
             
             services.AddScoped<IUserService, UserService>();
             services.AddSingleton<ITrackerService, TrackerService>();
+            services.AddSingleton<IEventService, EventService>();
+            services.AddSingleton<ICustomizationService, CustomizationService>();
             
             // Controllers registration
             services.AddControllers(options =>
