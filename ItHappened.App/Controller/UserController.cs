@@ -6,6 +6,7 @@ using ItHappened.Application;
 using ItHappened.Domain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 
 namespace ItHappened.App.Controller
 {
@@ -33,7 +34,13 @@ namespace ItHappened.App.Controller
                     var userGetResponse = new UserGetResponse(user);
                     return Ok(userGetResponse);
                 }, 
-                None: Ok("Error! :("));
+                None: Ok(new
+                {
+                    errors = new
+                    {
+                        commonError = "User not found."
+                    }
+                }));
         }
         
         [HttpPost]
@@ -48,15 +55,22 @@ namespace ItHappened.App.Controller
                     var userCreateResponse = new UserCreateResponse(token);
                     return Ok(userCreateResponse);
                 }, 
-                None: Ok("Error! :("));
+                None: Ok(new
+                {
+                    errors = new
+                    {
+                        passwordError = "Invalid password or user not found."
+                    }
+                }));
         }
         
         [HttpPost]
         [Route("signup")]
         public IActionResult CreateUser([FromBody] UserCreateRequest userCreateRequest)
         {
-            var userForm = new UserForm(userCreateRequest.Username, userCreateRequest.Password, new License());
+            var userForm = new UserForm(userCreateRequest.Username, userCreateRequest.Password);
             _userService.CreateUser(userForm);
+            
             var optionUser = _userService.LogInByCredentials(userForm.Username, userForm.Password);
 
             return optionUser.Match(
@@ -66,7 +80,13 @@ namespace ItHappened.App.Controller
                     var userCreateResponse = new UserCreateResponse(token);
                     return Ok(userCreateResponse);
                 }, 
-                None: Ok("Error! :("));
+                None: Ok(new
+                {
+                    errors = new
+                    {
+                        usernameError = "Username already taken."
+                    }
+                }));
         }
         
         [Authorize]
@@ -76,14 +96,20 @@ namespace ItHappened.App.Controller
         {
             var actorId = Guid.Parse(User.FindFirstValue(JwtClaimTypes.Id));
             var optionUser = _userService.GetUserById(actorId,actorId);
-            return optionUser.Match(
+            return optionUser.Match<IActionResult>(
                 Some: user =>
                 {
-                    var userForm = new UserForm(userUpdateRequest.Username, userUpdateRequest.Password, user.License);
+                    var userForm = new UserForm(userUpdateRequest.Username, userUpdateRequest.Password);
                     _userService.EditUser(actorId, actorId, userForm);
-                    return Ok("Success!");
+                    return Ok("Check your page to view results!");
                 }, 
-                None: Ok("Error! :("));
+                None: Ok(new
+                {
+                    errors = new
+                    {
+                        usernameError = "Username already taken."
+                    }
+                }));
         }
         
         [Authorize]
@@ -99,7 +125,13 @@ namespace ItHappened.App.Controller
                     _userService.DeleteUser(actorId, actorId);
                     return Ok("Success!");
                 }, 
-                None: Ok("Error! :("));
+                None: Ok(new
+                {
+                    errors = new
+                    {
+                        commonError = "Internal error."
+                    }
+                }));
         }
         
     }

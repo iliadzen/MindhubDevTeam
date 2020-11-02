@@ -10,10 +10,11 @@ namespace ItHappened.Application
 {
     public class UserService : IUserService
     {
-        public UserService(IRepository<User> userRepository, IRepository<Tracker> trackerRepository, IHasher hasher)
+        public UserService(IRepository<User> userRepository, IRepository<License> licenseRepository, IHasher hasher)
         {
             _userRepository = userRepository;
-            _trackerRepository = trackerRepository;
+            _licenseRepository = licenseRepository;
+            //_trackerRepository = trackerRepository;
             _hasher = hasher;
         }
 
@@ -48,10 +49,11 @@ namespace ItHappened.Application
             if (CheckFormIsComplete(form, "Creating"))
             {
                 var user = new User(Guid.NewGuid(),
-                    form.Username, _hasher.MakeSaltedHash(form.Password),
-                    form.License, DateTime.Now, DateTime.Now);
-
+                    form.Username, _hasher.MakeSaltedHash(form.Password),DateTime.Now, DateTime.Now);
+                var license = new License(Guid.NewGuid(), user.Id, LicenseType.Free, DateTime.MaxValue);
+                
                 _userRepository.Save(user);
+                _licenseRepository.Save(license);
                 Log.Information($"User {form.Username} with ID {user.Id} created");
             }
         }
@@ -69,12 +71,10 @@ namespace ItHappened.Application
                 var oldUser = _userRepository.Get(userId);
                 oldUser.Do(user =>
                 {
-                    var newUser = new User(userId,
-                        form.Username, _hasher.MakeSaltedHash(form.Password),
-                        form.License, user.CreationDate, DateTime.Now);
-
-                    _userRepository.Update(newUser);
-                    Log.Information($"User {form.Username} with ID {newUser.Id} updated");
+                    user.Username = form.Username;
+                    user.PasswordHash = _hasher.MakeSaltedHash(form.Password);
+                    _userRepository.Update(user);
+                    Log.Information($"User {form.Username} with ID {user.Id} updated");
                 });
             }
         }
@@ -86,10 +86,11 @@ namespace ItHappened.Application
                 Log.Error($"User {actorId} tried to delete {userId} account");
                 return;
             }
-            DeleteUserTrackers(userId);
+            //DeleteUserTrackers(userId);
             _userRepository.Delete(userId);
         }
-
+        
+        /*
         private void DeleteUserTrackers(Guid userId)
         {
             var usersTrackers = _trackerRepository.GetAll()
@@ -99,9 +100,11 @@ namespace ItHappened.Application
                 _trackerRepository.Delete(tracker.Id);
             }
         }
+        */
 
         public Option<User> LogInByCredentials(string username, string password)
         {
+            
             var user = GetUserByUsername(username);
             if (user.IsNone)
                 return Option<User>.None;
@@ -118,7 +121,7 @@ namespace ItHappened.Application
         {
             if (!form.IsNull())
             {
-                if (form.Username.IsNull() || form.Password.IsNull() || form.License.IsNull())
+                if (form.Username.IsNull() || form.Password.IsNull())
                 {
                     Log.Error($"{actionWithForm} user failed: form incomplete"); 
                     return false;
@@ -136,7 +139,8 @@ namespace ItHappened.Application
         }
         
         private readonly IRepository<User> _userRepository;
-        private readonly IRepository<Tracker> _trackerRepository;
+        private readonly IRepository<License> _licenseRepository;
+        //private readonly IRepository<Tracker> _trackerRepository;
         private readonly IHasher _hasher;
     }
 }
