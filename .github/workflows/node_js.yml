@@ -19,8 +19,8 @@ jobs:
           uses: actions/setup-node@v1
           with:
             node-version: ${{ matrix.node-version }}
-        - run: npm install
-        - run: npm run build --if-present
-        - run: npm test
+        - run: npm install --prefix ./ithappened.nodejs
+        - run: npm run build --if-present --prefix ./ithappened.nodejs
+        - run: npm test --prefix ./ithappened.nodejs
           env:
             CI: true
