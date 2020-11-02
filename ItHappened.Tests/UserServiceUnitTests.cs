@@ -15,10 +15,8 @@ namespace ItHappened.Tests
         {
             _fixture = new Fixture();
             _mockUserRepository = new RepositoryMock<User>();
-            _mockTrackerRepository = new RepositoryMock<Tracker>();
             _mockLicenseRepository = new RepositoryMock<License>();
-            _userService = new UserService(_mockUserRepository, _mockLicenseRepository,
-            _mockTrackerRepository, new FakeHasher());
+            _userService = new UserService(_mockUserRepository, _mockLicenseRepository, new FakeHasher());
         }
         
         [Test]
@@ -126,31 +124,23 @@ namespace ItHappened.Tests
         }
         
         [Test]
-        public void DeleteUser_UserDeletesByHimself_UserAndHisTrackersWereDeleted()
+        public void DeleteUser_UserDeletesByHimself_UserWereDeleted()
         {
             var user = EntityMaker.CreateSomeUser(_mockUserRepository);
-            EntityMaker.CreateSomeTracker(user.Id, _mockTrackerRepository);
-            EntityMaker.CreateSomeTracker(user.Id, _mockTrackerRepository);
-            EntityMaker.CreateSomeTracker(Guid.NewGuid(), _mockTrackerRepository);
             
             _userService.DeleteUser(user.Id, user.Id);
 
             Assert.AreEqual(0, _mockUserRepository.GetAll().Count);
-            Assert.AreEqual(1, _mockTrackerRepository.GetAll().Count);
         }
         
         [Test]
-        public void DeleteUser_UserDeletesByAnotherUser_UserAndHisTrackersWereNotDeleted()
+        public void DeleteUser_UserDeletesByAnotherUser_UserWereNotDeleted()
         {
             var user = EntityMaker.CreateSomeUser(_mockUserRepository);
-            EntityMaker.CreateSomeTracker(user.Id, _mockTrackerRepository);
-            EntityMaker.CreateSomeTracker(user.Id, _mockTrackerRepository);
-            EntityMaker.CreateSomeTracker(Guid.NewGuid(), _mockTrackerRepository);
             
             _userService.DeleteUser(Guid.NewGuid(), user.Id);
 
             Assert.AreEqual(1, _mockUserRepository.GetAll().Count);
-            Assert.AreEqual(3, _mockTrackerRepository.GetAll().Count);
         }
 
         [Test]
@@ -184,7 +174,6 @@ namespace ItHappened.Tests
 
         private Fixture _fixture;
         private RepositoryMock<User> _mockUserRepository;
-        private RepositoryMock<Tracker> _mockTrackerRepository;
         private RepositoryMock<License> _mockLicenseRepository;
         private UserService _userService;
     }

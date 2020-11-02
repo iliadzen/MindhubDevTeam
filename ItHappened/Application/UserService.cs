@@ -11,12 +11,11 @@ namespace ItHappened.Application
 {
     public class UserService : IUserService
     {
-        public UserService(IRepository<User> userRepository, IRepository<License> licenseRepository,
-            IRepository<Tracker> trackerRepository, IHasher hasher)
+        public UserService(IRepository<User> userRepository, IRepository<License> licenseRepository, IHasher hasher)
         {
             _userRepository = userRepository;
             _licenseRepository = licenseRepository;
-            _trackerRepository = trackerRepository;
+            //_trackerRepository = trackerRepository;
             _hasher = hasher;
         }
 
@@ -91,7 +90,8 @@ namespace ItHappened.Application
             //DeleteUserTrackers(userId);
             _userRepository.Delete(userId);
         }
-
+        
+        /*
         private void DeleteUserTrackers(Guid userId)
         {
             var usersTrackers = _trackerRepository.GetAll()
@@ -101,6 +101,7 @@ namespace ItHappened.Application
                 _trackerRepository.Delete(tracker.Id);
             }
         }
+        */
 
         public Option<User> LogInByCredentials(string username, string password)
         {
@@ -140,7 +141,7 @@ namespace ItHappened.Application
         
         private readonly IRepository<User> _userRepository;
         private readonly IRepository<License> _licenseRepository;
-        private readonly IRepository<Tracker> _trackerRepository;
+        //private readonly IRepository<Tracker> _trackerRepository;
         private readonly IHasher _hasher;
     }
 }
