@@ -1,7 +1,7 @@
 name: Node.js CI
 defaults:
     run:
-        working-directory: ./app
+        working-directory: ./ithappened.nodejs
 on:
     push:
         branches:
