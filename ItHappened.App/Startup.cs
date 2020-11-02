@@ -26,6 +26,7 @@ namespace ItHappened.App
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors();
             // Jwt configure
             var jwtConfig = Configuration.GetSection("JwtConfig").Get<JwtConfiguration>();
             services.AddSingleton(jwtConfig);
@@ -84,9 +85,14 @@ namespace ItHappened.App
             }
 
             app.UseRouting();
-            
+            app.UseCors(
+                builder => builder.AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader());
+
             app.UseAuthentication();
             app.UseAuthorization();
+
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }
