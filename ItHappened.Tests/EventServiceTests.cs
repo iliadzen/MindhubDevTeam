@@ -20,13 +20,11 @@ namespace ItHappened.Tests
             _mockTrackerRepository = new RepositoryMock<Tracker>();
             _mockEventRepository = new RepositoryMock<Event>();
 
-            _userOne = _fixture.Create<User>();
-            _userTwo = _fixture.Create<User>();
-            _mockUserRepository.Save(_userOne);
-            _mockUserRepository.Save(_userTwo);
+            _userOne = EntityMaker.CreateSomeUser(_mockUserRepository, "userOne");
+            _userTwo = EntityMaker.CreateSomeUser(_mockUserRepository, "userTwo");
 
-            _trackerUserOne = CreateAndSaveSomeTracker(_userOne.Id);
-            _trackerUserTwo = CreateAndSaveSomeTracker(_userTwo.Id);
+            _trackerUserOne = EntityMaker.CreateSomeTracker(_userOne.Id, _mockTrackerRepository);
+            _trackerUserTwo = EntityMaker.CreateSomeTracker(_userTwo.Id, _mockTrackerRepository);
             
             _eventService = new EventService(_mockEventRepository, _mockTrackerRepository);
         }
@@ -57,8 +55,8 @@ namespace ItHappened.Tests
         [Test]
         public void GetEvent_UserGetsOwnEvent_SuccessfullyGot()
         {
-            var @event = CreateAndSaveSomeEvent(_trackerUserOne.Id);
-            
+            var @event = EntityMaker.CreateSomeEvent(_trackerUserOne.Id, _mockEventRepository);
+            var rr = EntityMaker.CreateSomeEvent(_trackerUserOne.Id, _mockEventRepository);
             var gottenEvent = _eventService.GetEvent(_userOne.Id, @event.Id).ValueUnsafe();
 
             Assert.AreEqual(@event.Id, gottenEvent.Id);
@@ -69,7 +67,7 @@ namespace ItHappened.Tests
         [Test]
         public void GetEvent_UserGetsSomeonesEvent_EventNotGot()
         {
-            var @event = CreateAndSaveSomeEvent(_trackerUserOne.Id);
+            var @event = EntityMaker.CreateSomeEvent(_trackerUserOne.Id, _mockEventRepository);
             
             var gottenEvent = _eventService.GetEvent(_userTwo.Id, @event.Id).ValueUnsafe();
 
@@ -79,7 +77,7 @@ namespace ItHappened.Tests
         [Test]
         public void GetEvent_UserGetsNoExistedEvent_EventNotGot()
         {
-            var @event = CreateAndSaveSomeEvent(_trackerUserOne.Id);
+            var @event = EntityMaker.CreateSomeEvent(_trackerUserOne.Id, _mockEventRepository);
             
             var gottenEvent = _eventService.GetEvent(_userOne.Id, Guid.NewGuid()).ValueUnsafe();
 
@@ -89,8 +87,8 @@ namespace ItHappened.Tests
         [Test]
         public void GetEventsByTrackerId_UserHaveTwoEventsInRepositoryAndGetsIt_SuccessfullyGotTwo()
         {
-            var eventOne = CreateAndSaveSomeEvent(_trackerUserOne.Id);
-            var eventTwo = CreateAndSaveSomeEvent(_trackerUserOne.Id);
+            var eventOne = EntityMaker.CreateSomeEvent(_trackerUserOne.Id, _mockEventRepository);
+            var eventTwo = EntityMaker.CreateSomeEvent(_trackerUserOne.Id, _mockEventRepository);
             
             var events = _eventService.GetEventsByTrackerId(_userOne.Id, _trackerUserOne.Id);
 
@@ -100,8 +98,8 @@ namespace ItHappened.Tests
         [Test]
         public void GetEventsByTrackerId_SomeoneWantsToGetOthersEvents_EventsNotGot()
         {
-            var eventOne = CreateAndSaveSomeEvent(_trackerUserOne.Id);
-            var eventTwo = CreateAndSaveSomeEvent(_trackerUserOne.Id);
+            var eventOne = EntityMaker.CreateSomeEvent(_trackerUserOne.Id, _mockEventRepository);
+            var eventTwo = EntityMaker.CreateSomeEvent(_trackerUserOne.Id, _mockEventRepository);
             
             var events = _eventService.GetEventsByTrackerId(_userTwo.Id, _trackerUserOne.Id);
 
@@ -111,8 +109,9 @@ namespace ItHappened.Tests
         [Test]
         public void GetEventsByTrackerId_SomeoneWantsToGetEventsFromNotExistedTracker_EventsNotGot()
         {
-            var eventOne = CreateAndSaveSomeEvent(_trackerUserOne.Id);
-            var eventTwo = CreateAndSaveSomeEvent(_trackerUserOne.Id);
+            var eventOne = EntityMaker.CreateSomeEvent(_trackerUserOne.Id, _mockEventRepository);
+            var eventTwo = EntityMaker.CreateSomeEvent(_trackerUserOne.Id, _mockEventRepository);
+
             
             var events = _eventService.GetEventsByTrackerId(_userOne.Id, Guid.NewGuid());
 
@@ -122,7 +121,7 @@ namespace ItHappened.Tests
         [Test]
         public void EditEvent_UserEditOwnEvent_SuccessfullyEdited()
         {
-            var @event = CreateAndSaveSomeEvent(_trackerUserOne.Id);
+            var @event = EntityMaker.CreateSomeEvent(_trackerUserOne.Id, _mockEventRepository);
             
             _eventService.EditEvent(_userOne.Id, @event.Id, new EventContent("2"));
 
@@ -133,7 +132,7 @@ namespace ItHappened.Tests
         [Test]
         public void EditEvent_UserEditOthersEvent_EventNotChanges()
         {
-            var @event = CreateAndSaveSomeEvent(_trackerUserOne.Id);
+            var @event = EntityMaker.CreateSomeEvent(_trackerUserOne.Id, _mockEventRepository);
             
             _eventService.EditEvent(_userTwo.Id, @event.Id, new EventContent("2"));
 
@@ -144,7 +143,7 @@ namespace ItHappened.Tests
         [Test]
         public void EditEvent_UserEditNotExistedEvent_NothingHappens()
         {
-            var @event = CreateAndSaveSomeEvent(_trackerUserOne.Id);
+            var @event = EntityMaker.CreateSomeEvent(_trackerUserOne.Id, _mockEventRepository);
             
             _eventService.EditEvent(_userOne.Id, Guid.NewGuid(), new EventContent("2"));
 
@@ -154,7 +153,7 @@ namespace ItHappened.Tests
         [Test]
         public void DeleteEvent_UserDeletesOwnEvent_SuccessfullyDeleted()
         {
-            var @event = CreateAndSaveSomeEvent(_trackerUserOne.Id);
+            var @event = EntityMaker.CreateSomeEvent(_trackerUserOne.Id, _mockEventRepository);
             
             _eventService.DeleteEvent(_userOne.Id, @event.Id);
 
@@ -165,7 +164,7 @@ namespace ItHappened.Tests
         [Test]
         public void DeleteEvent_UserDeletesSomeonesEvent_EventNotDeleted()
         {
-            var @event = CreateAndSaveSomeEvent(_trackerUserOne.Id);
+            var @event = EntityMaker.CreateSomeEvent(_trackerUserOne.Id, _mockEventRepository);
             
             _eventService.DeleteEvent(_userTwo.Id, @event.Id);
 
@@ -176,7 +175,7 @@ namespace ItHappened.Tests
         [Test]
         public void DeleteEvent_UserDeletesNotExistedEvent_NothingHappens()
         {
-            var @event = CreateAndSaveSomeEvent(_trackerUserOne.Id);
+            var @event = EntityMaker.CreateSomeEvent(_trackerUserOne.Id, _mockEventRepository);
             
             _eventService.DeleteEvent(_userOne.Id, Guid.NewGuid());
 
@@ -193,32 +192,5 @@ namespace ItHappened.Tests
         private User _userTwo;
         private Tracker _trackerUserOne;
         private Tracker _trackerUserTwo;
-
-        private Tracker CreateAndSaveSomeTracker(Guid userId)
-        {
-            var trackerId = Guid.NewGuid();
-            var tracker =  new Tracker(
-                trackerId,
-                userId,
-                $"{trackerId}",
-                DateTime.Now,
-                DateTime.Now,
-                new HashSet<CustomizationType>());
-            _mockTrackerRepository.Save(tracker);
-            return tracker;
-        }
-
-        private Event CreateAndSaveSomeEvent(Guid trackerId)
-        {
-            var eventId = Guid.NewGuid();
-            var @event = new Event(
-                eventId,
-                trackerId,
-                $"{eventId}",
-                DateTime.Now,
-                DateTime.Now);
-            _mockEventRepository.Save(@event);
-            return @event;
-        }
     }
 }

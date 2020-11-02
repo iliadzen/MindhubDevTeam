@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using ItHappened.Domain;
 using LanguageExt;
-using LanguageExt.UnsafeValueAccess;
 
 namespace ItHappened.Application
 {
@@ -88,9 +87,6 @@ namespace ItHappened.Application
                 {
                     if (actorId != tracker.UserId) return;
                     EventRepository.Delete(eventId);
-                    // Cascade dependencies (CustomEventData) delete:
-                    // GetCustomEventDataByEvent
-                    // foreach delete
                 });
             });
         }

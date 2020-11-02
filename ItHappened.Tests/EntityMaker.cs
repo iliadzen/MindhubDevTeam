@@ -13,7 +13,6 @@ namespace ItHappened.Tests
                 Guid.NewGuid(), 
                 username,
                 "admin",
-                new License(), 
                 DateTime.Now, 
                 DateTime.Now);
             repository.Save(user);

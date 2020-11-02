@@ -4,22 +4,24 @@ namespace ItHappened.Domain
 {
     public class User : IEntity
     {
-        public Guid Id { get; }
-        public string Username { get; }
-        public string PasswordHash { get; }
-        public License License { get; }
-        public DateTime CreationDate { get; }
-        public DateTime ModificationDate { get; }
+        public Guid Id { get; private set; }
+        public string Username { get; set; }
+        public string PasswordHash { get; set; }
+        public DateTime CreationDate { get; private set; }
+        public DateTime ModificationDate { get; private set; }
 
-        public User(Guid id, string username, string passwordHash, License license,
+        public User(Guid id, string username, string passwordHash,
             DateTime creationDate, DateTime modificationDate)
         {
             Id = id;
             Username = username ?? throw new ArgumentNullException(nameof(username));
             PasswordHash = passwordHash ?? throw new ArgumentNullException(nameof(passwordHash));
-            License = license;
             CreationDate = creationDate;
             ModificationDate = modificationDate;
+        }
+
+        public User()
+        {
         }
     }
 }

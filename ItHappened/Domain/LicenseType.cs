@@ -2,7 +2,7 @@
 {
     public enum LicenseType
     {
-        Free,
-        Premium
+        Free = 0,
+        Premium = 1
     }
 }
