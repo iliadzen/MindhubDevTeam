@@ -4,15 +4,14 @@ import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
-import { userSignUp, userSignIn } from '../Api';
+import Alert from '@material-ui/lab/Alert';
+import { userSignIn } from '../Api';
 
 function Copyright() {
     return (
@@ -50,6 +49,9 @@ export default function UserSignIn() {
     const history = useHistory();
     const signIn = async (username, password) => {
         const {accessToken, errors} = await userSignIn(username, password);
+        if (errors) {
+            setCommonErrorMessage(errors["commonError"])
+        }
         if (accessToken) {
             localStorage.setItem("accessToken", accessToken);
             history.push("/")
@@ -61,11 +63,15 @@ export default function UserSignIn() {
     }
 
     const classes = useStyles();
+
     const [username, setUsername] = useState("");
-    const [usernameHelperText, setUsernameHelperText] = useState("")
     const [password, setPassword] = useState("");
-    const [passwordHelperText, setPasswordHelperText] = useState("")
     const [repeatPassword, setRepeatPassword] = useState("");
+
+    const [usernameHelperText, setUsernameHelperText] = useState("")
+    const [passwordHelperText, setPasswordHelperText] = useState("")
+
+    const [commonErrorMessage, setCommonErrorMessage] = useState("");
     return (
         <Container component="main" maxWidth="xs">
             <CssBaseline />
@@ -84,6 +90,13 @@ export default function UserSignIn() {
                 }}
             >
                 <Grid container spacing={2}>
+                {commonErrorMessage ? 
+                    <Grid item xs={12}>
+                        <Alert variant="outlined" severity="error">
+                            {commonErrorMessage}
+                        </Alert>
+                    </Grid>
+                    : []}
                     <Grid item xs={12}>
                         <TextField
                         autoComplete="login"

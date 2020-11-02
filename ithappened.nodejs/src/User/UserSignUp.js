@@ -12,9 +12,11 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
+import Alert from '@material-ui/lab/Alert';
+
 import { userSignUp } from '../Api';
 
-function Copyright() {
+const Copyright = () => {
     return (
         <Typography variant="body2" color="textSecondary" align="center">
             {'Copyright © MindboxDevSchool Mindhub Project'}
@@ -46,14 +48,16 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-export default function UserSignUp() {
+const UserSignUp = () => {
     const history = useHistory();
     const signIn = async (username, password, repeatPassword) => {
         if (password === repeatPassword) {
             const {accessToken, errors} = await userSignUp(username, password);
+            if (errors) {
+                setCommonError(errors["commonError"])
+            }
             if (accessToken) {
                 localStorage.setItem("accessToken", accessToken);
-                // window.location.href="/";
                 history.push("/")
             }
             else {
@@ -66,17 +70,21 @@ export default function UserSignUp() {
     }
 
     const classes = useStyles();
+
     const [username, setUsername] = useState("");
-    const [usernameHelperText, setUsernameHelperText] = useState("")
     const [password, setPassword] = useState("");
-    const [passwordHelperText, setPasswordHelperText] = useState("")
     const [repeatPassword, setRepeatPassword] = useState("");
+
+    const [usernameHelperText, setUsernameHelperText] = useState("")
+    const [passwordHelperText, setPasswordHelperText] = useState("")
+
+    const [commonError, setCommonError] = useState("");
     return (
         <Container component="main" maxWidth="xs">
             <CssBaseline />
             <div className={classes.paper}>
             <Avatar className={classes.avatar}>
-                <LockOutlinedIcon />
+                <LockOutlinedIcon/>
             </Avatar>
             <Typography component="h1" variant="h5">
                 Sign up
@@ -89,6 +97,13 @@ export default function UserSignUp() {
                 }}
             >
                 <Grid container spacing={2}>
+                    {commonError ? 
+                    <Grid item xs={12}>
+                        <Alert variant="outlined" severity="error">
+                            {commonError}
+                        </Alert>
+                    </Grid>
+                    : []}
                     <Grid item xs={12}>
                         <TextField
                         autoComplete="login"
@@ -167,3 +182,5 @@ export default function UserSignUp() {
         </Container>
     );
 }
+
+export default UserSignUp;
