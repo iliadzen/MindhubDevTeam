@@ -34,7 +34,13 @@ namespace ItHappened.App.Controller
                     var userGetResponse = new UserGetResponse(user);
                     return Ok(userGetResponse);
                 }, 
-                None: Ok("Error! :("));
+                None: Ok(new
+                {
+                    errors = new
+                    {
+                        commonError = "User not found."
+                    }
+                }));
         }
         
         [HttpPost]
@@ -49,7 +55,13 @@ namespace ItHappened.App.Controller
                     var userCreateResponse = new UserCreateResponse(token);
                     return Ok(userCreateResponse);
                 }, 
-                None: Ok("Error! :("));
+                None: Ok(new
+                {
+                    errors = new
+                    {
+                        passwordError = "Invalid password or user not found."
+                    }
+                }));
         }
         
         [HttpPost]
@@ -68,7 +80,13 @@ namespace ItHappened.App.Controller
                     var userCreateResponse = new UserCreateResponse(token);
                     return Ok(userCreateResponse);
                 }, 
-                None: Ok("Error! :("));
+                None: Ok(new
+                {
+                    errors = new
+                    {
+                        usernameError = "Username already taken."
+                    }
+                }));
         }
         
         [Authorize]
@@ -83,9 +101,15 @@ namespace ItHappened.App.Controller
                 {
                     var userForm = new UserForm(userUpdateRequest.Username, userUpdateRequest.Password);
                     _userService.EditUser(actorId, actorId, userForm);
-                    return Ok("Check your page to view results!!");
+                    return Ok("Check your page to view results!");
                 }, 
-                None: Ok("Error! :("));
+                None: Ok(new
+                {
+                    errors = new
+                    {
+                        usernameError = "Username already taken."
+                    }
+                }));
         }
         
         [Authorize]
@@ -101,7 +125,13 @@ namespace ItHappened.App.Controller
                     _userService.DeleteUser(actorId, actorId);
                     return Ok("Success!");
                 }, 
-                None: Ok("Error! :("));
+                None: Ok(new
+                {
+                    errors = new
+                    {
+                        commonError = "Internal error."
+                    }
+                }));
         }
         
     }

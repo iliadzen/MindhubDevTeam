@@ -32,7 +32,14 @@ namespace ItHappened.App.Controller
                     var trackerGetResponse = new TrackerGetResponse(tracker);
                     return Ok(trackerGetResponse);
                 },
-                None: NotFound("Tracker doesn't exist or no permissions to get"));
+                None: Ok(new
+                    {
+                        errors = new
+                        {
+                            commonError = "Tracker doesn't exist or no permissions to get."
+                        }
+                    }
+                ));
         }
         
         [Authorize]
@@ -73,7 +80,14 @@ namespace ItHappened.App.Controller
                     _trackerService.EditTracker(actorId, trackerId, form);
                     return Ok();
                 },
-                None: NotFound("Tracker doesn't exist or no permissions to edit"));
+                None: Ok(new
+                    {
+                        errors = new
+                        {
+                            commonError = "Tracker doesn't exist or no permissions to edit."
+                        }
+                    }
+                ));
         }
         
         [Authorize]
@@ -89,7 +103,14 @@ namespace ItHappened.App.Controller
                     _trackerService.DeleteTracker(actorId, trackerId);
                     return Ok();
                 },
-                None: NotFound("Tracker doesn't exist or no permissions to delete"));
+                None: Ok(new
+                    {
+                        errors = new
+                        {
+                            commonError = "Tracker doesn't exist or no permissions to delete."
+                        }
+                    }
+                ));
         }
         
         private readonly ITrackerService _trackerService;
