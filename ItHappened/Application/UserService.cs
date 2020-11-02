@@ -86,21 +86,8 @@ namespace ItHappened.Application
                 Log.Error($"User {actorId} tried to delete {userId} account");
                 return;
             }
-            //DeleteUserTrackers(userId);
             _userRepository.Delete(userId);
         }
-        
-        /*
-        private void DeleteUserTrackers(Guid userId)
-        {
-            var usersTrackers = _trackerRepository.GetAll()
-                .Where(tracker => tracker.UserId == userId).ToList().AsReadOnly();
-            foreach (var tracker in usersTrackers)
-            {
-                _trackerRepository.Delete(tracker.Id);
-            }
-        }
-        */
 
         public Option<User> LogInByCredentials(string username, string password)
         {
@@ -140,7 +127,6 @@ namespace ItHappened.Application
         
         private readonly IRepository<User> _userRepository;
         private readonly IRepository<License> _licenseRepository;
-        //private readonly IRepository<Tracker> _trackerRepository;
         private readonly IHasher _hasher;
     }
 }

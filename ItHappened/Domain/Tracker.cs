@@ -1,16 +1,17 @@
 using System;
 using System.Collections.Generic;
+using ItHappened.Infrastructure;
 
 namespace ItHappened.Domain
 {
     public class Tracker : IEntity
     {
-        public Guid Id { get; }
-        public Guid UserId { get; }
-        public string Title { get; }
-        public DateTime CreationDate { get; }
-        public DateTime ModificationDate { get; }
-        public ISet<CustomizationType> Customizations { get; }
+        public Guid Id { get; private set;  }
+        public Guid UserId { get; private set;  }
+        public string Title { get; set;  }
+        public DateTime CreationDate { get; private set;  }
+        public DateTime ModificationDate { get; set;  }
+        public ISet<CustomizationType> Customizations { get; set;  }
 
         public Tracker(Guid id, Guid userId, string title, DateTime creationDate, 
             DateTime modificationDate, ISet<CustomizationType> customizations)
@@ -21,6 +22,10 @@ namespace ItHappened.Domain
             CreationDate = creationDate;
             ModificationDate = modificationDate;
             Customizations = customizations;
+        }
+
+        public Tracker()
+        {
         }
     }
 }
