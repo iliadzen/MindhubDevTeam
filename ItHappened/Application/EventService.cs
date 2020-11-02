@@ -88,9 +88,6 @@ namespace ItHappened.Application
                 {
                     if (actorId != tracker.UserId) return;
                     EventRepository.Delete(eventId);
-                    // Cascade dependencies (CustomEventData) delete:
-                    // GetCustomEventDataByEvent
-                    // foreach delete
                 });
             });
         }
