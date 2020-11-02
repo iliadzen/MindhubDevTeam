@@ -2,21 +2,23 @@
 
 namespace ItHappened.Domain
 {
-    public class License
+    public class License : IEntity
     {
+        public Guid Id {get; set; }
+        public Guid UserId {get; set; }
         public LicenseType Type { get; set; }
         public DateTime ExpiryDate { get; set; }
 
-        public License(LicenseType type, DateTime expiryDate)
+        public License(Guid id, Guid userId, LicenseType type, DateTime expiryDate)
         {
+            Id = id;
+            UserId = userId;
             Type = type;
             ExpiryDate = expiryDate;
         }
         
         public License()
         {
-            Type = LicenseType.Free;
-            ExpiryDate = DateTime.Now;
         }
     }
 }

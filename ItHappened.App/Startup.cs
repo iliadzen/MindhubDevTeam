@@ -52,6 +52,7 @@ namespace ItHappened.App
                     )
                 );
             services.AddScoped<IRepository<User>, UserRepository>();
+            services.AddScoped<IRepository<License>, LicenseRepository>();
             
             
             services.AddScoped<IJwtIssuer, JwtIssuer>();

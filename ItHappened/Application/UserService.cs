@@ -11,9 +11,11 @@ namespace ItHappened.Application
 {
     public class UserService : IUserService
     {
-        public UserService(IRepository<User> userRepository, IRepository<Tracker> trackerRepository, IHasher hasher)
+        public UserService(IRepository<User> userRepository, IRepository<License> licenseRepository,
+            IRepository<Tracker> trackerRepository, IHasher hasher)
         {
             _userRepository = userRepository;
+            _licenseRepository = licenseRepository;
             _trackerRepository = trackerRepository;
             _hasher = hasher;
         }
@@ -50,8 +52,10 @@ namespace ItHappened.Application
             {
                 var user = new User(Guid.NewGuid(),
                     form.Username, _hasher.MakeSaltedHash(form.Password),DateTime.Now, DateTime.Now);
-
+                var license = new License(Guid.NewGuid(), user.Id, LicenseType.Free, DateTime.MaxValue);
+                
                 _userRepository.Save(user);
+                _licenseRepository.Save(license);
                 Log.Information($"User {form.Username} with ID {user.Id} created");
             }
         }
@@ -84,7 +88,7 @@ namespace ItHappened.Application
                 Log.Error($"User {actorId} tried to delete {userId} account");
                 return;
             }
-            DeleteUserTrackers(userId);
+            //DeleteUserTrackers(userId);
             _userRepository.Delete(userId);
         }
 
@@ -135,6 +139,7 @@ namespace ItHappened.Application
         }
         
         private readonly IRepository<User> _userRepository;
+        private readonly IRepository<License> _licenseRepository;
         private readonly IRepository<Tracker> _trackerRepository;
         private readonly IHasher _hasher;
     }

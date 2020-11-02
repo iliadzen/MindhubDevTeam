@@ -11,13 +11,14 @@ namespace ItHappened.Infrastructure
         }
         
         public DbSet<User> Users { get; set; }
+        public DbSet<License> Licenses { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<License>(builder =>
             {
                 builder.ToTable("Licenses", "ItHappened");
-                builder.Property<Guid>("Id");
+                //builder.Property<Guid>("Id");
             });
             
             modelBuilder.Entity<User>(builder =>

@@ -16,7 +16,9 @@ namespace ItHappened.Tests
             _fixture = new Fixture();
             _mockUserRepository = new RepositoryMock<User>();
             _mockTrackerRepository = new RepositoryMock<Tracker>();
-            _userService = new UserService(_mockUserRepository,  _mockTrackerRepository, new FakeHasher());
+            _mockLicenseRepository = new RepositoryMock<License>();
+            _userService = new UserService(_mockUserRepository, _mockLicenseRepository,
+            _mockTrackerRepository, new FakeHasher());
         }
         
         [Test]
@@ -183,6 +185,7 @@ namespace ItHappened.Tests
         private Fixture _fixture;
         private RepositoryMock<User> _mockUserRepository;
         private RepositoryMock<Tracker> _mockTrackerRepository;
+        private RepositoryMock<License> _mockLicenseRepository;
         private UserService _userService;
     }
 }
