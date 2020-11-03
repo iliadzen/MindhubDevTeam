@@ -6,6 +6,7 @@ namespace ItHappened.Application
 {
     public interface ICustomizationService
     {
-        public void AddCommentToEvent(Guid actorId, Guid eventId, CommentForm form);
+        void AddCommentToEvent(Guid actorId, Guid eventId, CommentForm form);
+        void AddTrackerCustomization(Guid actorId, Guid trackerId, CustomizationType type);
     }
 }

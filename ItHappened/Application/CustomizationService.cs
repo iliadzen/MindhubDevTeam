@@ -58,12 +58,16 @@ namespace ItHappened.Application
         public bool CheckTrackerHasCustomizationOfSuchDataType(IEnumerable<CustomizationType> customizations,
             IEventCustomizationData data)
         {
-            foreach (var customization in customizations)
+            if (!customizations.IsNull())
             {
-                var dataString = data.ToString().Split('.');
-                if (customization.ToString() == dataString[dataString.Length - 1])
-                    return true;
+                foreach (var customization in customizations)
+                {
+                    var dataString = data.ToString().Split('.');
+                    if (customization.ToString() == dataString[dataString.Length - 1])
+                        return true;
+                }
             }
+
             return false;
         }
         
