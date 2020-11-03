@@ -53,26 +53,26 @@ namespace ItHappened.App
                         .GetValue<string>("ConnectionString")
                     )
                 );
+            // Repositories
             services.AddScoped<IRepository<User>, UserRepository>();
             services.AddScoped<IRepository<License>, LicenseRepository>();
-            
-            
+            services.AddScoped<IRepository<Tracker>, TrackerRepository>();
+            services.AddScoped<IRepository<Event>, EventRepository>();
+            services.AddScoped<IRepository<Comment>, CommentRepository>();
+
+            // Utils
             services.AddScoped<IJwtIssuer, JwtIssuer>();
-            
-            // services.AddSingleton<IRepository<User>, InMemoryRepository<User>>();
-            services.AddSingleton<IRepository<Tracker>, InMemoryRepository<Tracker>>();
-            services.AddSingleton<IRepository<Event>, InMemoryRepository<Event>>();
-            services.AddSingleton<IRepository<Comment>, InMemoryRepository<Comment>>();
-            services.AddScoped<SaveChangesFilter>();
-            
             services.AddScoped<IHasher, Sha256Hasher>();
             
+            // Filters
+            services.AddScoped<SaveChangesFilter>();
+
+            // Services
             services.AddScoped<IUserService, UserService>();
-            services.AddSingleton<ITrackerService, TrackerService>();
-            services.AddSingleton<IEventService, EventService>();
-            services.AddSingleton<ICustomizationService, CustomizationService>();
+            services.AddScoped<ITrackerService, TrackerService>();
+            services.AddScoped<IEventService, EventService>();
             
-            // Controllers registration
+            // Controllers
             services.AddControllers(options =>
             {
                 options.Filters.AddService<SaveChangesFilter>();
