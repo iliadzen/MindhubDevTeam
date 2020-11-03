@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using ItHappened.Domain;
 using LanguageExt;
@@ -39,9 +38,10 @@ namespace ItHappened.Application
                         return;
                     }
 
-                    var newTracker = new Tracker(tracker.Id, tracker.UserId, form.Title,
-                        tracker.CreationDate, DateTime.Now, form.Customizations);
-                    _trackersRepository.Update(newTracker);
+                    tracker.Customizations = form.Customizations;
+                    tracker.Title = form.Title;
+                    tracker.ModificationDate = DateTime.Now;
+                    _trackersRepository.Update(tracker);
                 });
             }
         }

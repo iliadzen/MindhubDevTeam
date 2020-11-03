@@ -1,4 +1,6 @@
-namespace ItHappened.Infrastructure
+using ItHappened.Infrastructure;
+
+namespace ItHappened.Tests
 {
     public class FakeHasher : IHasher
     {

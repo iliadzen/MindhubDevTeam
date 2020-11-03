@@ -13,7 +13,6 @@ namespace ItHappened.Tests
                 Guid.NewGuid(), 
                 username,
                 "admin",
-                new License(), 
                 DateTime.Now, 
                 DateTime.Now);
             repository.Save(user);
@@ -29,7 +28,7 @@ namespace ItHappened.Tests
                 $"{trackerId}", 
                 DateTime.Now, 
                 DateTime.Now, 
-                _fixture.Create<ISet<CustomizationType>>());
+                new HashSet<CustomizationType>());
             repository.Save(tracker);
             
             return tracker;
@@ -48,7 +47,5 @@ namespace ItHappened.Tests
             
             return @event;
         }
-
-        private static Fixture _fixture = new Fixture();
     }
 }

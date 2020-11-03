@@ -1,0 +1,425 @@
+{
+	"info": {
+		"_postman_id": "a097e0d2-535d-4c41-9516-69456f41cd09",
+		"name": "MindHubItHappened",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "SignUp",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"User\",\r\n    \"password\": \"mindbox4life\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/users/signup",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"users",
+						"signup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "SignIn",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"TestUser\",\r\n    \"password\": \"TestPassword\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/users/signin",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"users",
+						"signin"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetSelf",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/users/self",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"users",
+						"self"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "EditSelf",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"EditedUsername\",\r\n    \"password\": \"TestPassword\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/users/self",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"users",
+						"self"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DeleteSelf",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/users/self",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"users",
+						"self"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CreateTracker",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"title\":\"Test tracker\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/trackers",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"trackers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetTrackers",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/trackers",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"trackers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetTracker",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/trackers/{{trackerId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"trackers",
+						"{{trackerId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "EditTracker",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"title\":\"Edited Tracker Title\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/trackers/{{trackerId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"trackers",
+						"{{trackerId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DeleteTracker",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/trackers/{{trackerId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"trackers",
+						"{{trackerId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CreateEvent",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"title\":\"Posted Some Shit from Postman again\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/trackers/{{trackerId}}/events",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"trackers",
+						"{{trackerId}}",
+						"events"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetEvents",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/trackers/{{trackerId}}/events",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"trackers",
+						"{{trackerId}}",
+						"events"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetEvent",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/trackers/{{trackerId}}/events/{{eventId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"trackers",
+						"{{trackerId}}",
+						"events",
+						"{{eventId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "EditEvent",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"title\":\"Posted and Edited Some Shit from Postman again\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/trackers/{{trackerId}}/events/{{eventId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"trackers",
+						"{{trackerId}}",
+						"events",
+						"{{eventId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DeleteEvent",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/trackers/{{trackerId}}/events/{{eventId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"trackers",
+						"{{trackerId}}",
+						"events",
+						"{{eventId}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTI1NiIsInR5cCI6IkpXVCJ9.eyJJZCI6IjEwMWJlODk2LWIxZDgtNDYxNi1iZDhlLWFlNDIxOTllZjU3NSIsImV4cCI6MTYwNDM5NjkzMn0.GFdqRDALy4R0OSMEvzdebUAL-RJEOanuGqsxoMxEzX4",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "0b1f9609-96c8-4d05-b641-2eb9fed25b0c",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "3495d79b-58eb-4919-9761-3730f77c6647",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "86998124-55c6-4538-af22-a9c77705435e",
+			"key": "baseUrl",
+			"value": "http://localhost:5000"
+		},
+		{
+			"id": "6a5e5e7b-2b52-46a5-9df4-b23a2997e31b",
+			"key": "trackerId",
+			"value": "0ec8c5ee-5837-40e8-af87-8d58384ab801"
+		},
+		{
+			"id": "0cdcccdf-469b-4df0-9e2b-eae381eafb61",
+			"key": "eventId",
+			"value": "8e5fb9cc-f32b-4710-a212-b8e08274b7d7"
+		}
+	],
+	"protocolProfileBehavior": {}
+}

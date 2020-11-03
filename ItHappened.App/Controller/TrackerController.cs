@@ -14,12 +14,11 @@ namespace ItHappened.App.Controller
     [Route("trackers")]
     public class TrackerController : ControllerBase
     {
-        public TrackerController(ITrackerService trackerService, IJwtIssuer jwtIssuer)
+        public TrackerController(ITrackerService trackerService)
         {
             _trackerService = trackerService;
         }
         
-        [Authorize]
         [HttpGet]
         [Route("{trackerId}")]
         public IActionResult GetTracker([FromRoute] Guid trackerId)
@@ -29,13 +28,19 @@ namespace ItHappened.App.Controller
             return optionTracker.Match<IActionResult>(
                 Some: tracker =>
                 {
-                    var trackerGetResponse = new TrackerGetResponse(tracker);
-                    return Ok(trackerGetResponse);
+                    var response = new TrackerGetResponse(tracker);
+                    return Ok(response);
                 },
-                None: NotFound("Tracker doesn't exist or no permissions to get"));
+                None: Ok(new
+                    {
+                        errors = new
+                        {
+                            commonError = "Tracker doesn't exist or no permissions to get."
+                        }
+                    }
+                ));
         }
         
-        [Authorize]
         [HttpPost]
         [Route("")]
         public IActionResult CreateTracker([FromBody] TrackerCreateRequest request)
@@ -46,7 +51,6 @@ namespace ItHappened.App.Controller
             return Ok();
         }
         
-        [Authorize]
         [HttpGet]
         [Route("")]
         public IActionResult GetTrackers()
@@ -59,7 +63,6 @@ namespace ItHappened.App.Controller
             return Ok(response);
         }
 
-        [Authorize]
         [HttpPut]
         [Route("{trackerId}")]
         public IActionResult UpdateTracker([FromRoute] Guid trackerId, [FromBody] TrackerCreateRequest request)
@@ -73,10 +76,16 @@ namespace ItHappened.App.Controller
                     _trackerService.EditTracker(actorId, trackerId, form);
                     return Ok();
                 },
-                None: NotFound("Tracker doesn't exist or no permissions to edit"));
+                None: Ok(new
+                    {
+                        errors = new
+                        {
+                            commonError = "Tracker doesn't exist or no permissions to edit."
+                        }
+                    }
+                ));
         }
         
-        [Authorize]
         [HttpDelete]
         [Route("{trackerId}")]
         public IActionResult DeleteTracker([FromRoute] Guid trackerId)
@@ -89,7 +98,14 @@ namespace ItHappened.App.Controller
                     _trackerService.DeleteTracker(actorId, trackerId);
                     return Ok();
                 },
-                None: NotFound("Tracker doesn't exist or no permissions to delete"));
+                None: Ok(new
+                    {
+                        errors = new
+                        {
+                            commonError = "Tracker doesn't exist or no permissions to delete."
+                        }
+                    }
+                ));
         }
         
         private readonly ITrackerService _trackerService;

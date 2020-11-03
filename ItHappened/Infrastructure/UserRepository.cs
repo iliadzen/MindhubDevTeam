@@ -1,0 +1,50 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using ItHappened.Domain;
+using LanguageExt;
+using Microsoft.EntityFrameworkCore;
+using Serilog;
+
+namespace ItHappened.Infrastructure
+{
+    public class UserRepository : IRepository<User>
+    {
+        private readonly CommonDbContext _context;
+        
+        public UserRepository(CommonDbContext context)
+        {
+            _context = context;
+        }
+
+        public void Save(User entity)
+        {
+            _context.Users.Add(entity);
+            _context.SaveChanges();
+        }
+
+        public Option<User> Get(Guid id)
+        {
+            return Option<User>.Some(_context.Users.SingleOrDefault(user => user.Id == id));
+        }
+
+        public IReadOnlyCollection<User> GetAll()
+        {
+            return !_context.Users.Any() ? new List<User>() : _context.Users.ToList();
+        }
+
+        public void Update(User entity)
+        {
+            _context.SaveChanges();
+        }
+
+        public void Delete(Guid id)
+        {
+            var optionalEntity = Get(id);
+            optionalEntity.Do(entity =>
+            {
+                _context.Users.Remove(entity);
+            });
+        }
+    }
+}
