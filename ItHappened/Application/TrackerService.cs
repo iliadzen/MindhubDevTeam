@@ -4,6 +4,7 @@ using System.Linq;
 using ItHappened.Domain;
 using LanguageExt;
 using LanguageExt.UnsafeValueAccess;
+using Newtonsoft.Json;
 using Serilog;
 
 namespace ItHappened.Application
@@ -20,7 +21,8 @@ namespace ItHappened.Application
             if (!form.IsNull())
             {
                 var tracker = new Tracker(Guid.NewGuid(), actorId, form.Title, DateTime.Now,
-                    DateTime.Now, form.Customizations);
+                    DateTime.Now, 
+                    JsonConvert.DeserializeObject<List<CustomizationType>>(form.Customizations));
                 _trackersRepository.Save(tracker);
             }
         }
@@ -38,7 +40,7 @@ namespace ItHappened.Application
                         return;
                     }
 
-                    tracker.Customizations = form.Customizations;
+                    //tracker.Customizations = form.Customizations;
                     tracker.Title = form.Title;
                     tracker.ModificationDate = DateTime.Now;
                     _trackersRepository.Update(tracker);

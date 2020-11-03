@@ -46,7 +46,7 @@ namespace ItHappened.App.Controller
         public IActionResult CreateTracker([FromBody] TrackerCreateRequest request)
         {
             var actorId = Guid.Parse(User.FindFirstValue(JwtClaimTypes.Id));
-            var form = new TrackerForm(request.Title, new HashSet<CustomizationType>());
+            var form = new TrackerForm(request.Title, request.Customizations);
             _trackerService.CreateTracker(actorId, form);
             return Ok();
         }
@@ -72,7 +72,7 @@ namespace ItHappened.App.Controller
             return optionTracker.Match<IActionResult>(
                 Some: tracker =>
                 {
-                    var form = new TrackerForm(request.Title, new HashSet<CustomizationType>());
+                    var form = new TrackerForm(request.Title, "");
                     _trackerService.EditTracker(actorId, trackerId, form);
                     return Ok();
                 },
@@ -107,7 +107,7 @@ namespace ItHappened.App.Controller
                     }
                 ));
         }
-        
+
         private readonly ITrackerService _trackerService;
     }
 }

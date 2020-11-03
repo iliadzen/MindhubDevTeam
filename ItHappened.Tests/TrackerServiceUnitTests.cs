@@ -19,7 +19,6 @@ namespace ItHappened.Tests
             _someonesId = Guid.NewGuid();
             _mockTrackerRepository = new RepositoryMock<Tracker>();
             _mockEventRepository = new RepositoryMock<Event>();
-            _customizations = _fixture.Create<ISet<CustomizationType>>();
             _trackerService = new TrackerService(_mockTrackerRepository, _mockEventRepository);
         }
         [Test]
@@ -115,7 +114,6 @@ namespace ItHappened.Tests
         private RepositoryMock<Event> _mockEventRepository;
         private Guid _userId;
         private Guid _someonesId;
-        private ISet<CustomizationType> _customizations;
         private TrackerService _trackerService;
     }
 }

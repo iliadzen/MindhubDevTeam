@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Generic;
 using ItHappened.Application;
 using ItHappened.Domain;
 using ItHappened.Domain.Customizations;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 namespace ItHappened.Infrastructure
 {
@@ -33,11 +35,17 @@ namespace ItHappened.Infrastructure
             });
             
             // Tracker
-            modelBuilder.Entity<Tracker>(builder =>
+            modelBuilder.Entity<Tracker>
+            (builder =>
             {
                 builder.ToTable("Trackers", "ItHappened");
                 builder.HasOne<Tracker>().WithMany().HasForeignKey(tracker => tracker.UserId);
-                builder.Ignore(_ => _.Customizations);
+                builder.Property((tracker => tracker.Customizations))
+                    .HasColumnName("Customizations")
+                    .HasConversion(
+                        c => JsonConvert.SerializeObject(c), 
+                        c => JsonConvert.DeserializeObject<List<CustomizationType>>(c));
+                //builder.Ignore(_ => _.Customizations);
             });
             
             // Event
