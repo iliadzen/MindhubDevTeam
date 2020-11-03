@@ -22,6 +22,12 @@ namespace ItHappened.Application
                 .Where(t => t.UserId == userId)
                 .Select(t => t.Id);
 
+        public IEnumerable<IStatsFact> GetStatsFactsForUser(Guid userId) =>
+            GetStatsFactsForTrackers(GetTrackersForUser(userId));
+
+        public IEnumerable<IStatsFact> GetStatsFactsForTracker(Guid trackerId) =>
+            GetStatsFactsForTrackers(new[] {trackerId});
+
         public IEnumerable<IStatsFact> GetStatsFactsForTrackers(IEnumerable<Guid> trackerIds)
         {
             HashSet<Guid> trackerIdSet = new HashSet<Guid>(trackerIds);
