@@ -1,6 +1,6 @@
 namespace ItHappened.App.Authentication
 {
-    public class JwtClaimTypes
+    public static class JwtClaimTypes
     {
         public const string Id = "Id";
     }
