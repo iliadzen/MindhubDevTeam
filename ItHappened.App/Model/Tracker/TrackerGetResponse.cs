@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ItHappened.Domain;
+using LanguageExt;
 
 namespace ItHappened.App.Model
 {
@@ -20,8 +21,9 @@ namespace ItHappened.App.Model
             Title = tracker.Title;
             CreationDate = tracker.CreationDate;
             ModificationDate = tracker.ModificationDate;
-            foreach (var customization in tracker.Customizations)
-                Customizations.Add(customization.ToString());
+            if(!tracker.Customizations.IsNull())
+                foreach (var customization in tracker.Customizations)
+                    Customizations.Add(customization.ToString());
         }
     }
 }
