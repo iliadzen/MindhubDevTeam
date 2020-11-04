@@ -25,8 +25,8 @@ namespace ItHappened.Tests
         [Test]
         public void CheckTrackerHasCustomizationOfSuchDataType_NoSuchCustomizationTypeInSet_False()
         {
-            var customizations = new HashSet<CustomizationType>();
-            var comment = new Comment(Guid.NewGuid(), Guid.NewGuid(), "TestContent", DateTime.Now);
+            var customizations = new List<CustomizationType>();
+            var comment = new Comment(Guid.NewGuid(), Guid.NewGuid(), "TestContent");
 
             var check = _customizationService.CheckTrackerHasCustomizationOfSuchDataType(customizations, comment);
             
@@ -36,9 +36,9 @@ namespace ItHappened.Tests
         [Test]
         public void CheckTrackerHasCustomizationOfSuchDataType_SuchCustomizationTypeInSet_True()
         {
-            var customizations = new HashSet<CustomizationType>();
+            var customizations = new List<CustomizationType>();
             customizations.Add(CustomizationType.Comment);
-            var comment = new Comment(Guid.NewGuid(), Guid.NewGuid(), "TestContent", DateTime.Now);
+            var comment = new Comment(Guid.NewGuid(), Guid.NewGuid(), "TestContent");
 
             var check = _customizationService.CheckTrackerHasCustomizationOfSuchDataType(customizations, comment);
             
@@ -140,14 +140,14 @@ namespace ItHappened.Tests
         }
         
         [Test]
-        public void AddCommentToEvent_UserAddsCommentToOwnEventButEventAalreadyHasComment_CommentAdded()
+        public void AddCommentToEvent_UserAddsCommentToOwnEventButEventAlreadyHasComment_CommentAdded()
         {
             var userId = Guid.NewGuid();
             var tracker = EntityMaker.CreateSomeTracker(userId, _mockTrackerRepository);
             tracker.Customizations.Add(CustomizationType.Comment);
             _mockTrackerRepository.Update(tracker);
             var @event = EntityMaker.CreateSomeEvent(tracker.Id, _mockEventRepository);
-            var comment = new Comment(Guid.NewGuid(), @event.Id, "TestContent", DateTime.Now);
+            var comment = new Comment(Guid.NewGuid(), @event.Id, "TestContent");
             _mockCommentRepository.Save(comment);
             var form = _fixture.Create<CommentForm>();
             

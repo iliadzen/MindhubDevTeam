@@ -23,7 +23,7 @@ namespace ItHappened.Application
             {
                 if (!string.IsNullOrEmpty(form.Content))
                 {
-                    var comment = new Comment(Guid.NewGuid(), eventId, form.Content, DateTime.Now);
+                    var comment = new Comment(Guid.NewGuid(), eventId, form.Content);
                     AddEventCustomizationData(actorId, eventId, comment, _commentRepository);
                 }
                 Log.Error("Content of comment is null or empty");

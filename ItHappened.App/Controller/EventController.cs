@@ -36,7 +36,7 @@ namespace ItHappened.App.Controller
             var events = _eventService.GetEventsByTrackerId(actorId, trackerId);
             var response = new List<EventGetResponse>();
             foreach (var @event in events)
-                response.Add(new EventGetResponse(@event));
+                response.Add(new EventGetResponse(@event, new List<ICustomizationGetResponse>()));
             
             return Ok(response);
         }
@@ -50,7 +50,7 @@ namespace ItHappened.App.Controller
             return optionEvent.Match<IActionResult>(
                 Some: @event =>
                 {
-                    var response = new EventGetResponse(@event);
+                    var response = new EventGetResponse(@event, new List<ICustomizationGetResponse>());
                     return Ok(response);
                 },
                 None: Ok(new
