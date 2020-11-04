@@ -4,6 +4,8 @@ import UserSignUp from './UserSignUp';
 const UserSignOut = () => {
     const history = useHistory();
     localStorage.removeItem("accessToken");
+    localStorage.removeItem("username");
+
     history.push("/");
     return([]);
 }

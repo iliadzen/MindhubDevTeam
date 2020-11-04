@@ -54,6 +54,8 @@ export default function UserSignIn() {
         }
         if (accessToken) {
             localStorage.setItem("accessToken", accessToken);
+            localStorage.setItem("username", username);
+
             history.push("/")
         }
         else {

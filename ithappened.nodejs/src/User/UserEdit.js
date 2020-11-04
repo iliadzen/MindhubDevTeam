@@ -69,7 +69,7 @@ const UserEdit = () => {
 
     const classes = useStyles();
 
-    const [username, setUsername] = useState("");
+    const [username, setUsername] = useState(localStorage.getItem("username"));
     const [password, setPassword] = useState("");
     const [repeatPassword, setRepeatPassword] = useState("");
 

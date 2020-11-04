@@ -56,6 +56,7 @@ const UserSignUp = () => {
             const {accessToken, errors} = await userSignUp(username, password);
             if (accessToken) {
                 localStorage.setItem("accessToken", accessToken);
+                localStorage.setItem("username", username);
                 history.push("/")
             }
             if (errors) {
