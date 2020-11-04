@@ -4,8 +4,11 @@ using System.Security.Claims;
 using ItHappened.App.Authentication;
 using ItHappened.App.Model;
 using ItHappened.Application;
+using ItHappened.Domain.Customizations;
+using LanguageExt;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace ItHappened.App.Controller
 {
@@ -13,9 +16,10 @@ namespace ItHappened.App.Controller
     [Route("trackers/{trackerId}")]
     public class EventController : ControllerBase
     {
-        public EventController(IEventService eventService)
+        public EventController(IEventService eventService, ICustomizationService customizationService)
         {
             _eventService = eventService;
+            _customizationService = customizationService;
         }
         
         [HttpPost]
@@ -24,7 +28,14 @@ namespace ItHappened.App.Controller
         {
             var actorId = Guid.Parse(User.FindFirstValue(JwtClaimTypes.Id));
             var form = new EventContent(request.Title);
-            _eventService.CreateEvent(actorId, trackerId, form);
+            var eventId = _eventService.CreateEvent(actorId, trackerId, form);
+            if (eventId != Guid.Empty)
+            {
+                if (!request.Customizations.IsNull())
+                    AddCustomizationsToEvent(actorId, trackerId, eventId, request.Customizations);
+            }
+            else
+                return Ok("Tracker doesn't exists or no permissions to create.");
             return Ok();
         }
         
@@ -108,6 +119,15 @@ namespace ItHappened.App.Controller
                 ));
         }
 
+        private void AddCustomizationsToEvent(Guid actorId, Guid trackerId, Guid eventId,
+            CustomizationsCreateRequests createRequests)
+        {
+            if(!createRequests.CommentCreateRequest.IsNull())
+                _customizationService.AddCommentToEvent(actorId, eventId, 
+                    new CommentForm(createRequests.CommentCreateRequest.Content));
+        }
+
         private readonly IEventService _eventService;
+        private readonly ICustomizationService _customizationService;
     }
 }

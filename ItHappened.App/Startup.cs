@@ -71,6 +71,7 @@ namespace ItHappened.App
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ITrackerService, TrackerService>();
             services.AddScoped<IEventService, EventService>();
+            services.AddScoped<ICustomizationService, CustomizationService>();
             
             // Controllers
             services.AddControllers(options =>

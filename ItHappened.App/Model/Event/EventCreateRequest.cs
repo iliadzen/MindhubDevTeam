@@ -5,6 +5,6 @@ namespace ItHappened.App.Model
     public class EventCreateRequest
     {
         public string Title { get; set; }
-        public List<ICustomizationCreateRequest> Customizations { get; set; }
+        public CustomizationsCreateRequests Customizations { get; set; }
     }
 }

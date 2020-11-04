@@ -18,17 +18,20 @@ namespace ItHappened.Application
             _trackerRepository = trackerRepository;
         }
 
-        public void CreateEvent(Guid actorId, Guid trackerId, EventContent eventContent)
+        public Guid CreateEvent(Guid actorId, Guid trackerId, EventContent eventContent)
         {
-            if (eventContent.IsNull()) return;
+            if (eventContent.IsNull()) return Guid.Empty;
             var optionTracker = _trackerRepository.Get(trackerId);
-            optionTracker.Do(tracker =>
+            return optionTracker.Match(
+                Some: tracker =>
             {
-                if (actorId != tracker.UserId) return;
+                if (actorId != tracker.UserId) return Guid.Empty;
                 var eventId = Guid.NewGuid();
                 var @event = new Event(eventId, trackerId, eventContent.Title, DateTime.Now, DateTime.Now);
                 _eventRepository.Save(@event);
-            }); }
+                return eventId;
+            },
+                None: Guid.Empty); }
         
         public Option<Event> GetEvent(Guid actorId, Guid eventId)
         {
