@@ -27,7 +27,7 @@ namespace ItHappened.App.Controller
         public IActionResult CreateEvent([FromRoute] Guid trackerId, [FromBody] EventCreateRequest request)
         {
             var actorId = Guid.Parse(User.FindFirstValue(JwtClaimTypes.Id));
-            var form = new EventContent(request.Title);
+            var form = new EventForm(request.Title);
             var eventId = _eventService.CreateEvent(actorId, trackerId, form);
             if (eventId != Guid.Empty)
             {
@@ -83,7 +83,7 @@ namespace ItHappened.App.Controller
             return optionEvent.Match<IActionResult>(
                 Some: tracker =>
                 {
-                    var form = new EventContent(request.Title);
+                    var form = new EventForm(request.Title);
                     _eventService.EditEvent(actorId, eventId, form);
                     return Ok();
                 },
@@ -125,6 +125,20 @@ namespace ItHappened.App.Controller
             if(!createRequests.CommentCreateRequest.IsNull())
                 _customizationService.AddCommentToEvent(actorId, eventId, 
                     new CommentForm(createRequests.CommentCreateRequest.Content));
+            
+            if(!createRequests.RatingCreateRequest.IsNull())
+                _customizationService.AddRatingToEvent(actorId, eventId,
+                    new RatingForm(createRequests.RatingCreateRequest.Stars));
+            
+            if(!createRequests.ScaleCreateRequest.IsNull())
+                _customizationService.AddScaleToEvent(actorId, eventId, 
+                    new ScaleForm(createRequests.ScaleCreateRequest.Value));
+                
+            if(!createRequests.GeotagCreateRequest.IsNull())
+                _customizationService.AddGeotagToEvent(actorId, eventId,
+                    new GeotagForm(
+                        createRequests.GeotagCreateRequest.Longitude, 
+                        createRequests.GeotagCreateRequest.Latitude));
         }
 
         private readonly IEventService _eventService;

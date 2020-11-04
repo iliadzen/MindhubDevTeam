@@ -92,7 +92,7 @@ namespace ItHappened.App.Controller
         [Authorize]
         [HttpPut]
         [Route("self")]
-        public IActionResult UpdateUser([FromBody] UserUpdateRequest userUpdateRequest)
+        public IActionResult UpdateUser([FromBody] UserCreateRequest userUpdateRequest)
         {
             var actorId = Guid.Parse(User.FindFirstValue(JwtClaimTypes.Id));
             var optionUser = _userService.GetUserById(actorId,actorId);

@@ -7,10 +7,10 @@ namespace ItHappened.Domain.Customizations
     {
         public Guid Id { get; private  set; }
         public Guid EventId  { get; private  set; }
-        public double Longitude { get; private  set; }
-        public double Latitude { get; private  set; }
+        public decimal Longitude { get; private  set; }
+        public decimal Latitude { get; private  set; }
 
-        public Geotag(Guid id, Guid eventId, double longitude, double latitude)
+        public Geotag(Guid id, Guid eventId, decimal longitude, decimal latitude)
         {
             Id = id;
             EventId = eventId;

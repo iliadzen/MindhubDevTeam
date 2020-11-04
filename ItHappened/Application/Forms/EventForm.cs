@@ -1,10 +1,10 @@
 namespace ItHappened.Application
 {
-    public class EventContent
+    public class EventForm
     {
         public string Title { get; }
 
-        public EventContent(string title)
+        public EventForm(string title)
         {
             Title = title;
         }

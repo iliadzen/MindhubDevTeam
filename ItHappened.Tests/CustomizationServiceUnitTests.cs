@@ -6,6 +6,7 @@ using ItHappened.Domain;
 using ItHappened.Domain.Customizations;
 using NUnit.Framework;
 using AutoFixture;
+using ItHappened.Infrastructure;
 
 namespace ItHappened.Tests
 {
@@ -19,7 +20,8 @@ namespace ItHappened.Tests
             _mockEventRepository = new RepositoryMock<Event>();
             _mockTrackerRepository = new RepositoryMock<Tracker>();
             _customizationService = new CustomizationService(_mockTrackerRepository, _mockEventRepository,
-                _mockCommentRepository);
+                _mockCommentRepository, new RepositoryMock<Rating>(), new RepositoryMock<Scale>(), 
+                new RepositoryMock<Geotag>(), new RepositoryMock<Photo>());
         }
 
         [Test]
@@ -138,27 +140,10 @@ namespace ItHappened.Tests
             var comments = _mockCommentRepository.GetAll();
             Assert.AreEqual(0, comments.Count);
         }
-        
-        [Test]
-        public void AddCommentToEvent_UserAddsCommentToOwnEventButEventAlreadyHasComment_CommentAdded()
-        {
-            var userId = Guid.NewGuid();
-            var tracker = EntityMaker.CreateSomeTracker(userId, _mockTrackerRepository);
-            tracker.Customizations.Add(CustomizationType.Comment);
-            _mockTrackerRepository.Update(tracker);
-            var @event = EntityMaker.CreateSomeEvent(tracker.Id, _mockEventRepository);
-            var comment = new Comment(Guid.NewGuid(), @event.Id, "TestContent");
-            _mockCommentRepository.Save(comment);
-            var form = _fixture.Create<CommentForm>();
-            
-            _customizationService.AddCommentToEvent(userId, @event.Id, form);
-
-            var comments = _mockCommentRepository.GetAll();
-            Assert.AreEqual(1, comments.Count);
-        }
 
         private Fixture _fixture;
         private RepositoryMock<Comment> _mockCommentRepository;
+        
         private RepositoryMock<Event> _mockEventRepository;
         private RepositoryMock<Tracker> _mockTrackerRepository;
         private CustomizationService _customizationService;

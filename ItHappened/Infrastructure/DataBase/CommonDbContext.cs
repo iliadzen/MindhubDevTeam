@@ -18,7 +18,12 @@ namespace ItHappened.Infrastructure
         public DbSet<License> Licenses { get; set; }
         public DbSet<Tracker> Trackers { get; set; }
         public DbSet<Event> Events { get; set; }
+        
         public DbSet<Comment> Comments { get; set; }
+        public DbSet<Rating> Ratings { get; set; }
+        public DbSet<Scale> Scales { get; set; }
+        public DbSet<Geotag> Geotags { get; set; }
+        public DbSet<Photo> Photos { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -50,10 +55,42 @@ namespace ItHappened.Infrastructure
                 builder.HasOne<Event>().WithMany().HasForeignKey(@event => @event.TrackerId);
             });
             
-            modelBuilder.Entity<Comment>(builder =>
+            //Customizations
+            AddCustomizationModel<Comment>(modelBuilder, "Comments");
+            AddCustomizationModel<Rating>(modelBuilder, "Ratings");
+            //AddCustomizationModel<Scale>(modelBuilder, "Scales");
+            //AddCustomizationModel<Geotag>(modelBuilder, "Geotags");
+            AddCustomizationModel<Photo>(modelBuilder, "Photos");
+            
+            modelBuilder.Entity<Scale>(builder =>
             {
-                builder.ToTable("Comments", "ItHappened");
-                builder.HasOne<Event>().WithMany().HasForeignKey(comment => comment.EventId);
+                builder.ToTable("Scales", "ItHappened");
+                builder.HasOne<Event>().WithMany().HasForeignKey(entity => entity.EventId);
+                builder.Property(scale => scale.Value)
+                    .HasColumnName("Value")
+                    .HasColumnType("decimal");
+            });
+            modelBuilder.Entity<Geotag>(builder =>
+            {
+                builder.ToTable("Geotags", "ItHappened");
+                builder.HasOne<Event>().WithMany().HasForeignKey(entity => entity.EventId);
+                builder.Property(tag => tag.Longitude)
+                    .HasColumnName("Longitude")
+                    .HasColumnType("decimal(18)");
+                builder.Property(tag => tag.Latitude)
+                    .HasColumnName("Latitude")
+                    .HasColumnType("decimal(18)");
+            });
+            
+        }
+
+        private void AddCustomizationModel<T>(ModelBuilder modelBuilder, string tableName)
+        where T : class, IEventCustomizationData
+        {
+            modelBuilder.Entity<T>(builder =>
+            {
+                builder.ToTable(tableName, "ItHappened");
+                builder.HasOne<Event>().WithMany().HasForeignKey(entity => entity.EventId);
             });
         }
     }

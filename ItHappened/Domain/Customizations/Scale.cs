@@ -7,9 +7,9 @@ namespace ItHappened.Domain.Customizations
     {
         public Guid Id { get; private  set;}
         public Guid EventId  { get; private  set; }
-        public double Value { get; private  set; }
+        public decimal Value { get; private  set; }
 
-        public Scale(Guid id, Guid eventId, double value)
+        public Scale(Guid id, Guid eventId, decimal value)
         {
             Id = id;
             EventId = eventId;
