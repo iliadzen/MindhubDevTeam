@@ -11,7 +11,7 @@ namespace ItHappened.Infrastructure
     public class UserRepository : IRepository<User>
     {
         private readonly CommonDbContext _context;
-
+        
         public UserRepository(CommonDbContext context)
         {
             _context = context;
@@ -25,7 +25,7 @@ namespace ItHappened.Infrastructure
 
         public Option<User> Get(Guid id)
         {
-            return Option<User>.Some(_context.Users.SingleOrDefault(_ => _.Id == id));
+            return Option<User>.Some(_context.Users.SingleOrDefault(user => user.Id == id));
         }
 
         public IReadOnlyCollection<User> GetAll()
@@ -40,8 +40,11 @@ namespace ItHappened.Infrastructure
 
         public void Delete(Guid id)
         {
-            var entity = Get(id);
-            entity.Do(_ => _context.Remove(_));
+            var optionalEntity = Get(id);
+            optionalEntity.Do(entity =>
+            {
+                _context.Users.Remove(entity);
+            });
         }
     }
 }
