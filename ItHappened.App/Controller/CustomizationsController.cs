@@ -26,7 +26,7 @@ namespace ItHappened.App.Controller
         {
             var actorId = Guid.Parse(User.FindFirstValue(JwtClaimTypes.Id));
             _customizationService.AddTrackerCustomization(actorId, trackerId, CustomizationType.Comment);
-            return Ok();
+            return NoContent();
         }
         
         [HttpPost]
@@ -36,7 +36,7 @@ namespace ItHappened.App.Controller
             var actorId = Guid.Parse(User.FindFirstValue(JwtClaimTypes.Id));
             var form = new CommentForm(request.Content);
             _customizationService.AddCommentToEvent(actorId, eventId, form);
-            return Ok();
+            return NoContent();
         }
         
         private readonly ICustomizationService _customizationService;

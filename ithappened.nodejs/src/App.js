@@ -2,6 +2,8 @@ import {BrowserRouter, Switch, Route, Redirect} from "react-router-dom";
 import UserSignUp from "./User/UserSignUp";
 import UserSignIn from "./User/UserSignIn";
 import UserApp from "./User/UserApp";
+import UserSignOut from "./User/UserSignOut";
+import UserEdit from "./User/UserEdit";
 
 const welcomeText = () => (
     <div>
@@ -27,6 +29,12 @@ const App = () => {
                 </Route>
                 <Route path="/users/self">
                     {!localStorage.getItem("accessToken") ? <Redirect to="/users/signin"/> : <UserApp />}
+                </Route>
+                <Route path="/users/signout">
+                    {!localStorage.getItem("accessToken") ? <Redirect to="/"/> : <UserSignOut />}
+                </Route>
+                <Route path="/users/edit">
+                    {!localStorage.getItem("accessToken") ? <Redirect to="/"/> : <UserEdit />}
                 </Route>
                 {/* <Route path="/users/signout">
                     {localStorage.getItem("accessToken") ? localStorage.removeItem("accessToken") : []}

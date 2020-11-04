@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import {Link, useHistory} from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
@@ -39,7 +40,8 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function InsetDividers() {
+export default function UserApp() {
+    const history = useHistory();
     const classes = useStyles();
     const [userContent, setUserContent] = useState({username:"Loading...", creationDate:"Loading...", modificationDate:"Loading..."});
     const fetchUserContent = async () => {
@@ -80,7 +82,7 @@ export default function InsetDividers() {
                                         <CalendarTodayOutlinedIcon />
                                     </Avatar>
                                     </ListItemAvatar>
-                                    <ListItemText primary="Work" secondary={userContent.creationDate} />
+                                    <ListItemText primary="Creation Date" secondary={userContent.creationDate} />
                                 </ListItem>
                                 <Divider variant="inset" component="li" />
                                 <ListItem>
@@ -89,7 +91,7 @@ export default function InsetDividers() {
                                         <DateRangeOutlinedIcon />
                                     </Avatar>
                                     </ListItemAvatar>
-                                    <ListItemText primary="Vacation" secondary={userContent.modificationDate} />
+                                    <ListItemText primary="Modification Date" secondary={userContent.modificationDate} />
                                 </ListItem>
                             </List>
                         </CardContent>
@@ -97,22 +99,15 @@ export default function InsetDividers() {
                 </Grid>
             </Grid>
             <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                color="primary"
-                className={classes.submit}
-            >
-                Edit Profile
-            </Button>
-            <Button
-                type="submit"
                 fullWidth
                 variant="contained"
                 color="secondary"
                 className={classes.submit}
+                onClick={() => {
+                    history.push("/users/edit");
+                }}
             >
-                Delete Profile
+                Edit Profile
             </Button>
         </div>
         </Container>

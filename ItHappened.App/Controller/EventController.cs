@@ -25,7 +25,7 @@ namespace ItHappened.App.Controller
             var actorId = Guid.Parse(User.FindFirstValue(JwtClaimTypes.Id));
             var form = new EventContent(request.Title);
             _eventService.CreateEvent(actorId, trackerId, form);
-            return Ok();
+            return NoContent();
         }
         
         [HttpGet]
@@ -53,11 +53,11 @@ namespace ItHappened.App.Controller
                     var response = new EventGetResponse(@event);
                     return Ok(response);
                 },
-                None: Ok(new
+                None: NotFound(new
                     {
                         errors = new
                         {
-                            commonError = "Event doesn't exist or no permissions to get."
+                            commonError = "Event doesn't exist."
                         }
                     }
                 ));
@@ -74,13 +74,13 @@ namespace ItHappened.App.Controller
                 {
                     var form = new EventContent(request.Title);
                     _eventService.EditEvent(actorId, eventId, form);
-                    return Ok();
+                    return NoContent();
                 },
-                None: Ok(new
+                None: NotFound(new
                     {
                         errors = new
                         {
-                            commonError = "Event doesn't exist or no permissions to edit."
+                            commonError = "Event doesn't exist."
                         }
                     }
                 ));
@@ -96,13 +96,13 @@ namespace ItHappened.App.Controller
                 Some: @event =>
                 {
                     _eventService.DeleteEvent(actorId, eventId);
-                    return Ok();
+                    return NoContent();
                 },
-                None: Ok(new
+                None: NotFound(new
                     {
                         errors = new
                         {
-                            commonError = "Event doesn't exist or no permissions to delete."
+                            commonError = "Event doesn't exist."
                         }
                     }
                 ));

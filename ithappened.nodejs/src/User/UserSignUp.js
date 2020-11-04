@@ -50,17 +50,16 @@ const useStyles = makeStyles((theme) => ({
 
 const UserSignUp = () => {
     const history = useHistory();
+
     const signIn = async (username, password, repeatPassword) => {
         if (password === repeatPassword) {
             const {accessToken, errors} = await userSignUp(username, password);
-            if (errors) {
-                setCommonError(errors["commonError"])
-            }
             if (accessToken) {
                 localStorage.setItem("accessToken", accessToken);
                 history.push("/")
             }
-            else {
+            if (errors) {
+                setCommonError(errors["commonError"]);
                 const {usernameError} = errors;
                 setUsernameHelperText(usernameError);
             }
