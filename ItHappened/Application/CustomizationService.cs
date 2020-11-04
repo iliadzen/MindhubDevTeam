@@ -10,11 +10,19 @@ namespace ItHappened.Application
     public class CustomizationService : ICustomizationService
     {
         public CustomizationService(IRepository<Tracker> trackerRepository, IRepository<Event> eventRepository,
-            IRepository<Comment> commentRepository)
+            IRepository<Comment> commentRepository) /*, IRepository<Rating> ratingRepository,
+            IRepository<Scale> scaleRepository, IRepository<Geotag> geotagRepository, 
+            IRepository<Photo> photoRepository)*/
         {
             _trackerRepository = trackerRepository;
             _eventRepository = eventRepository;
             _commentRepository = commentRepository;
+            /*
+            _ratingRepository = ratingRepository;
+            _scaleRepository = scaleRepository;
+            _geotagRepository = geotagRepository;
+            _photoRepository = photoRepository;
+            */
         }
 
         public void AddCommentToEvent(Guid actorId, Guid eventId, CommentForm form)
@@ -103,8 +111,7 @@ namespace ItHappened.Application
                         if (!CheckEventCustomizationDataOfSuchTypeAddedToEvent(eventId, _commentRepository))
                         {
                             repository.Save(data);
-                            Log.Information($"Customization {customizationType} " +
-                                            $"added to {eventId}");
+                            Log.Information($"Customization {customizationType} added to {eventId}");
                         }
                         else
                             Log.Error($"Event {eventId} already has customization of " +
@@ -137,5 +144,9 @@ namespace ItHappened.Application
         private readonly IRepository<Tracker> _trackerRepository;
         private readonly IRepository<Event> _eventRepository;
         private readonly IRepository<Comment> _commentRepository;
+        private readonly IRepository<Rating> _ratingRepository;
+        private readonly IRepository<Scale> _scaleRepository;
+        private readonly IRepository<Geotag> _geotagRepository;
+        private readonly IRepository<Photo> _photoRepository;
     }
 }

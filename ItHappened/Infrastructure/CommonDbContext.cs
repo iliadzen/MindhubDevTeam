@@ -22,19 +22,16 @@ namespace ItHappened.Infrastructure
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // License
             modelBuilder.Entity<License>(builder =>
             {
                 builder.ToTable("Licenses", "ItHappened");
             });
 
-            // User
             modelBuilder.Entity<User>(builder =>
             {
                 builder.ToTable("Users", "ItHappened");
             });
             
-            // Tracker
             modelBuilder.Entity<Tracker>
             (builder =>
             {
@@ -45,17 +42,14 @@ namespace ItHappened.Infrastructure
                     .HasConversion(
                         c => JsonConvert.SerializeObject(c), 
                         c => JsonConvert.DeserializeObject<List<CustomizationType>>(c));
-                //builder.Ignore(_ => _.Customizations);
             });
             
-            // Event
             modelBuilder.Entity<Event>(builder =>
             {
                 builder.ToTable("Events", "ItHappened");
                 builder.HasOne<Event>().WithMany().HasForeignKey(@event => @event.TrackerId);
             });
             
-            // Customization/Comment
             modelBuilder.Entity<Comment>(builder =>
             {
                 builder.ToTable("Comments", "ItHappened");
