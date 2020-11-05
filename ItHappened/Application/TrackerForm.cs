@@ -6,9 +6,9 @@ namespace ItHappened.Application
     public class TrackerForm
     {
         public string Title { get; }
-        public ISet<CustomizationType> Customizations { get; }
+        public string Customizations { get; }
 
-        public TrackerForm(string title, ISet<CustomizationType> customizations)
+        public TrackerForm(string title, string customizations)
         {
             Title = title;
             Customizations = customizations;
