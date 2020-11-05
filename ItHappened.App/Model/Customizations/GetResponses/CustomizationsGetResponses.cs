@@ -7,15 +7,5 @@ namespace ItHappened.App.Model
         public ScaleGetResponse Scale { get; set; }
         public RatingGetResponse Rating { get; set; }
         
-        /*
-        public CustomizationsGetResponses(GeotagGetResponse geotag, CommentGetResponse comment,
-            ScaleGetResponse scale, RatingGetResponse rating)
-        {
-            Geotag = geotag;
-            Comment = comment;
-            Scale = scale;
-            Rating = rating;
-        }
-        */
     }
 }

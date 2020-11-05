@@ -235,7 +235,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"title\":\"Test event\",\r\n    \"customizations\": \r\n    {\r\n        \"CommentCreateRequest\": {\"Content\":\"Some!\"},\r\n        \"RatingCreateRequest\": {\"Stars\":4},\r\n        \"ScaleCreateRequest\": {\"Value\":3.14},\r\n        \"GeotagCreateRequest\": {\"Longitude\":38.52,\"Latitude\":77.11}\r\n    }\r\n}",
+					"raw": "{\r\n    \"title\":\"Test event\",\r\n    \"customizations\": \r\n    {\r\n        \"Comment\": {\"Content\":\"Test comment\"},\r\n        \"Rating\": {\"Stars\":5},\r\n        \"Scale\": {\"Value\":100},\r\n        \"Geotag\": {\"Longitude\":38.52,\"Latitude\":77.11}\r\n    }\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -350,7 +350,7 @@
 		"bearer": [
 			{
 				"key": "token",
-				"value": "eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTI1NiIsInR5cCI6IkpXVCJ9.eyJJZCI6ImFhZjAwNGJlLTkxNzItNGU5Zi1iNTE3LWFmNmRhMmFmYzQzYiIsImV4cCI6MTYwNDUyODEyN30.-VpoQ9cBN7K2HIkWm8t-vpIjnxF7lJUD1jF121q48Jo",
+				"value": "eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTI1NiIsInR5cCI6IkpXVCJ9.eyJJZCI6ImFhZjAwNGJlLTkxNzItNGU5Zi1iNTE3LWFmNmRhMmFmYzQzYiIsImV4cCI6MTYxMDgxMzY0Nn0.eCwVDp9T8jrRVibw0P7gug_NpdEIx3GOgny3lnUAUa8",
 				"type": "string"
 			}
 		]
@@ -379,17 +379,17 @@
 	],
 	"variable": [
 		{
-			"id": "ae7fbe7a-7c63-49b0-a900-5eab84773ca7",
+			"id": "3a5a3bed-5251-4257-afd9-1c2f044e0785",
 			"key": "baseUrl",
 			"value": "http://localhost:5000"
 		},
 		{
-			"id": "e8b1694c-204d-44cb-9c14-97d86e4164b0",
+			"id": "3056ad3e-538a-43fa-87b6-df35ce6a1c5b",
 			"key": "trackerId",
-			"value": "0DA36BC7-55C1-46B5-A470-8EC717B460FC"
+			"value": "8CE583AF-CF2A-4F71-9082-727B5EF568C6"
 		},
 		{
-			"id": "d2cc3631-96e9-4438-9d12-3b99a17bdcc9",
+			"id": "d310cdaa-16d8-4e29-b6ed-315b28bc0d3c",
 			"key": "eventId",
 			"value": "8e5fb9cc-f32b-4710-a212-b8e08274b7d7"
 		}
