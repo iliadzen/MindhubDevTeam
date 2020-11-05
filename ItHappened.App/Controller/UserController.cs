@@ -28,13 +28,13 @@ namespace ItHappened.App.Controller
         {
             var actorId = Guid.Parse(User.FindFirstValue(JwtClaimTypes.Id));
             var optionUser = _userService.GetUserById(actorId,actorId);
-            return optionUser.Match(
+            return optionUser.Match<IActionResult>(
                 Some: user =>
                 {
                     var userGetResponse = new UserGetResponse(user);
                     return Ok(userGetResponse);
                 }, 
-                None: Ok(new
+                None: NotFound(new
                 {
                     errors = new
                     {
@@ -48,7 +48,7 @@ namespace ItHappened.App.Controller
         public IActionResult LoginUser([FromBody] LoginRequest loginRequest)
         {
             var optionUser = _userService.LogInByCredentials(loginRequest.Username, loginRequest.Password);
-            return optionUser.Match(
+            return optionUser.Match<IActionResult>(
                 Some: user =>
                 {
                     var token = _jwtIssuer.GenerateToken(user);
@@ -59,7 +59,8 @@ namespace ItHappened.App.Controller
                 {
                     errors = new
                     {
-                        passwordError = "Invalid password or user not found."
+                        passwordError = "Invalid password.",
+                        commonError = "There are errors with some fields bellow."
                     }
                 }));
         }
@@ -73,7 +74,7 @@ namespace ItHappened.App.Controller
             
             var optionUser = _userService.LogInByCredentials(userForm.Username, userForm.Password);
 
-            return optionUser.Match(
+            return optionUser.Match<IActionResult>(
                 Some: user =>
                 {
                     var token = _jwtIssuer.GenerateToken(user);
@@ -84,7 +85,8 @@ namespace ItHappened.App.Controller
                 {
                     errors = new
                     {
-                        usernameError = "Username already taken."
+                        usernameError = "Username already taken.",
+                        commonError = "There are errors with some fields bellow."
                     }
                 }));
         }
@@ -101,13 +103,14 @@ namespace ItHappened.App.Controller
                 {
                     var userForm = new UserForm(userUpdateRequest.Username, userUpdateRequest.Password);
                     _userService.EditUser(actorId, actorId, userForm);
-                    return Ok("Check your page to view results!");
+                    return NoContent();
                 }, 
                 None: Ok(new
                 {
                     errors = new
                     {
-                        usernameError = "Username already taken."
+                        usernameError = "Username already taken.",
+                        commonError = "There are errors with some fields bellow."
                     }
                 }));
         }
@@ -119,11 +122,11 @@ namespace ItHappened.App.Controller
         {
             var actorId = Guid.Parse(User.FindFirstValue(JwtClaimTypes.Id));
             var optionUser = _userService.GetUserById(actorId,actorId);
-            return optionUser.Match(
+            return optionUser.Match<IActionResult>(
                 Some: user =>
                 {
                     _userService.DeleteUser(actorId, actorId);
-                    return Ok("Success!");
+                    return NoContent();
                 }, 
                 None: Ok(new
                 {
