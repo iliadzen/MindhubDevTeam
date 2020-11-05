@@ -4,11 +4,9 @@ using System.Security.Claims;
 using ItHappened.App.Authentication;
 using ItHappened.App.Model;
 using ItHappened.Application;
-using ItHappened.Domain.Customizations;
 using LanguageExt;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 
 namespace ItHappened.App.Controller
 {
@@ -30,12 +28,17 @@ namespace ItHappened.App.Controller
             var form = new EventForm(request.Title);
             var eventId = _eventService.CreateEvent(actorId, trackerId, form);
             if (eventId == Guid.Empty)
-                return Ok("Tracker doesn't exists or no permissions to create.");
-            
+                return NotFound(new
+                {
+                    errors = new
+                    {
+                        commonError = $"Tracker {trackerId} doesn't exists or no permissions to create."
+                    }
+                });
             if (!request.Customizations.IsNull())
                     AddCustomizationsToEvent(actorId, trackerId, eventId, request.Customizations);
             
-            return Ok();
+            return NoContent();
         }
         
         [HttpGet]
@@ -65,11 +68,11 @@ namespace ItHappened.App.Controller
                         FillCustomizationsGetResponses(actorId, eventId));
                     return Ok(response);
                 },
-                None: Ok(new
+                None: NotFound(new
                     {
                         errors = new
                         {
-                            commonError = "Event doesn't exist or no permissions to get."
+                            commonError = "Event doesn't exist."
                         }
                     }
                 ));
@@ -86,13 +89,13 @@ namespace ItHappened.App.Controller
                 {
                     var form = new EventForm(request.Title);
                     _eventService.EditEvent(actorId, eventId, form);
-                    return Ok();
+                    return NoContent();
                 },
-                None: Ok(new
+                None: NotFound(new
                     {
                         errors = new
                         {
-                            commonError = "Event doesn't exist or no permissions to edit."
+                            commonError = "Event doesn't exist."
                         }
                     }
                 ));
@@ -108,13 +111,13 @@ namespace ItHappened.App.Controller
                 Some: @event =>
                 {
                     _eventService.DeleteEvent(actorId, eventId);
-                    return Ok();
+                    return NoContent();
                 },
-                None: Ok(new
+                None: NotFound(new
                     {
                         errors = new
                         {
-                            commonError = "Event doesn't exist or no permissions to delete."
+                            commonError = "Event doesn't exist."
                         }
                     }
                 ));

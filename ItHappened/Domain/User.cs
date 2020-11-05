@@ -8,7 +8,7 @@ namespace ItHappened.Domain
         public string Username { get; set; }
         public string PasswordHash { get; set; }
         public DateTime CreationDate { get; private set; }
-        public DateTime ModificationDate { get; private set; }
+        public DateTime ModificationDate { get; set; }
 
         public User(Guid id, string username, string passwordHash,
             DateTime creationDate, DateTime modificationDate)

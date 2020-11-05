@@ -78,6 +78,7 @@ namespace ItHappened.Application
                 {
                     user.Username = form.Username;
                     user.PasswordHash = _hasher.MakeSaltedHash(form.Password);
+                    user.ModificationDate = DateTime.Now;
                     _userRepository.Update(user);
                     Log.Information($"User {form.Username} with ID {user.Id} updated");
                 });
