@@ -8,6 +8,8 @@ import TrackerCard from '../Components/Tracker/TrackerCard';
 import LinkButton from '../Components/Common/LinkButton';
 import { getTracker } from '../Api.js';
 
+import EventPreview from '../Components/Event/EventPreview';
+
 
 export default function TrackerDetail() {
     const history = useHistory();

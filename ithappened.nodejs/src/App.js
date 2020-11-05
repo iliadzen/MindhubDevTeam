@@ -28,6 +28,7 @@ const App = () => {
     return (
         <BrowserRouter>
             <Switch>
+                {/***************************************************************************************/}
                 <Route path="/users/signup">
                     {localStorage.getItem("accessToken") ? <Redirect to="/"/> : <UserSignUp />}
                 </Route>
@@ -38,17 +39,27 @@ const App = () => {
                     {!localStorage.getItem("accessToken") ? <Redirect to="/users/signin"/> : <UserApp />}
                 </Route>
                 <Route path="/users/signout">
-                    {!localStorage.getItem("accessToken") ? <Redirect to="/"/> : <UserSignOut />}
+                    {!localStorage.getItem("accessToken") ? <Redirect to="/users/signin"/> : <UserSignOut />}
                 </Route>
                 <Route path="/users/edit">
-                    {!localStorage.getItem("accessToken") ? <Redirect to="/"/> : <UserEdit />}
+                    {!localStorage.getItem("accessToken") ? <Redirect to="/users/signin"/> : <UserEdit />}
                 </Route>
-
+                {/***************************************************************************************/}
+                <Route path="/trackers/:trackerId/event/create">
+                    {!localStorage.getItem("accessToken") ? <Redirect to="/users/signin"/> : <Trackers />}
+                </Route>
+                <Route path="/trackers/:trackerId/event/:eventId/edit">
+                    {!localStorage.getItem("accessToken") ? <Redirect to="/users/signin"/> : <Trackers />}
+                </Route>
+                <Route path="/trackers/:trackerId/event/:eventId">
+                    {!localStorage.getItem("accessToken") ? <Redirect to="/users/signin"/> : <Trackers />}
+                </Route>
+                {/***************************************************************************************/}
                 <Route path="/trackers/create">
-                    {!localStorage.getItem("accessToken") ? <Redirect to="/"/> : <TrackerCreate />}
+                    {!localStorage.getItem("accessToken") ? <Redirect to="/users/signin"/> : <TrackerCreate />}
                 </Route>
                 <Route path="/trackers/:trackerId/edit">
-                    {!localStorage.getItem("accessToken") ? <Redirect to="/"/> : <TrackerEdit />}
+                    {!localStorage.getItem("accessToken") ? <Redirect to="/users/signins"/> : <TrackerEdit />}
                 </Route>
                 
                 <Route path="/trackers/:trackerId">
@@ -58,8 +69,9 @@ const App = () => {
                 <Route path="/trackers">
                     {!localStorage.getItem("accessToken") ? <Redirect to="/"/> : <Trackers />}
                 </Route>
-
+                {/***************************************************************************************/}
                 <Route path="/" component={welcomeText}/>
+                {/***************************************************************************************/}
             </Switch>
         </BrowserRouter>
     )
