@@ -6,21 +6,21 @@ import UserSignOut from "./User/UserSignOut";
 import UserEdit from "./User/UserEdit";
 import Trackers from "./Tracker/Trackers";
 import TrackerDetail from "./Tracker/TrackerDetail";
-import TrackerDelete from "./Tracker/TrackerDelete";
 import TrackerEdit from "./Tracker/TrackerEdit";
+import TrackerCreate from "./Tracker/TrackerCreate";
+import LinkButton from "./Components/Common/LinkButton"
 
 const welcomeText = () => (
     <div>
-        <h1>WARNING: Lol Exception</h1>
-        <ul>
-            <li><a href="users/signup">Sign Up</a></li>
-            <li><a href="users/signin">Sign In</a></li>
-            <li><a href="users/signout">Sign Out</a></li>
-            <li><a href="users/self">Profile</a></li>
-            <hr></hr>
-            <li><a href="trackers/create">Create Tracker</a></li>
-            <li><a href="trackers">All Trackers</a></li>
-        </ul>
+        <h1>It Happened!</h1>
+        <h3>Come as you are. Again.</h3>
+        <LinkButton url={'users/signup'} text="Sign Up"/><br></br>
+        <LinkButton url={'users/signin'} text="Sign In"/><br></br>
+        <LinkButton url={'users/signout'} text="Sign Out"/><br></br>
+        <LinkButton url={'users/self'} text="Profile"/><br></br>
+        <hr></hr>
+        <LinkButton url={'trackers/create'} color="secondary" text="Create Tracker"/><br></br>
+        <LinkButton url={'trackers'} color="secondary" text="All Trackers"/><br></br>
     </div>
 );
 
@@ -44,15 +44,17 @@ const App = () => {
                     {!localStorage.getItem("accessToken") ? <Redirect to="/"/> : <UserEdit />}
                 </Route>
 
+                <Route path="/trackers/create">
+                    {!localStorage.getItem("accessToken") ? <Redirect to="/"/> : <TrackerCreate />}
+                </Route>
                 <Route path="/trackers/:trackerId/edit">
                     {!localStorage.getItem("accessToken") ? <Redirect to="/"/> : <TrackerEdit />}
                 </Route>
-                <Route path="/trackers/:trackerId/delete">
-                    {!localStorage.getItem("accessToken") ? <Redirect to="/"/> : <TrackerDelete />}
-                </Route>
+                
                 <Route path="/trackers/:trackerId">
                     {!localStorage.getItem("accessToken") ? <Redirect to="/"/> : <TrackerDetail />}
                 </Route>
+                
                 <Route path="/trackers">
                     {!localStorage.getItem("accessToken") ? <Redirect to="/"/> : <Trackers />}
                 </Route>

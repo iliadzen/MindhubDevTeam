@@ -7,7 +7,7 @@ import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
 import { deleteTracker } from '../../Api';
-
+import LinkButton from '../Common/LinkButton';
 
 const useStyles = makeStyles((theme) => ({
     card: {
@@ -18,34 +18,29 @@ const useStyles = makeStyles((theme) => ({
 const TrackerCard = ({id, title, creationDate, modificationDate, customizations}) => {
     const history = useHistory();
     const classes = useStyles();
+
+    const handleDelete = async (trackerId) => {
+        await deleteTracker(id);
+        history.push(`/trackers`);
+    }
+
     return (
         <Card className={classes.card}>
             <CardContent>
                 <h3>{title}</h3>
                 <p>Creation date: {creationDate}</p>
                 <p>Modification date: {modificationDate}</p>
-                <p>Modifications: {customizations === [] ? customizations.join(" ") : "No Customisations"}</p>
+                <p>Customizations: {customizations.join(", ")}</p>
             </CardContent>
             <CardActions>
-            <Button
-                    fullWidth
-                    variant="contained"
-                    color="primary"
-                    className={classes.submit}
-                    onClick={() => {
-                        history.push(`/trackers/${id}/edit`);
-                    }}
-                >
-                    Edit
-                </Button>
+                <LinkButton url={`/trackers/${id}/edit`} text="Edit" fullWidth={true}/>
                 <Button
                     fullWidth
                     variant="contained"
                     color="secondary"
-                    className={classes.submit}
+                    style={{marginTop: "10px",}}
                     onClick={() => {
-                        deleteTracker(id);
-                        history.push(`/trackers`);
+                        handleDelete(id);
                     }}
                 >
                     Delete

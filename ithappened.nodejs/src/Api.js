@@ -17,3 +17,4 @@ export const getTrackers = () => instance.get("/trackers", authorizedRequestConf
 export const getTracker = (trackerId) => instance.get(`/trackers/${trackerId}`, authorizedRequestConfig).then(result => result.data);
 export const editTracker = (trackerName, trackerId) => instance.put(`/trackers/${trackerId}`, {title: trackerName}, authorizedRequestConfig).then(result => result.data);
 export const deleteTracker = (trackerId) => instance.delete(`/trackers/${trackerId}`, authorizedRequestConfig).then(result => result.data);
+export const createTracker = (trackerTitle, trackerCustomizations) => instance.post(`/trackers`, {title: trackerTitle, customizations: trackerCustomizations}, authorizedRequestConfig).then(result => result.data);

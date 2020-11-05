@@ -8,6 +8,7 @@ import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 
 import Tracker from '../Components/Tracker/TrackerPreview';
+import LinkButton from '../Components/Common/LinkButton'
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -24,7 +25,6 @@ export default function TrackersList() {
 
     const fetchTrackersList = async () => {
         const trackers = await getTrackers();
-        console.log(trackers);
         setTrackersList(trackers);
     }
     useEffect(() => {
@@ -33,17 +33,7 @@ export default function TrackersList() {
 
     return (
         <Container component="main" spacing="9">
-            <Button
-                style={{marginTop: "10px",}}
-                variant="contained"
-                color="primary"
-                className={classes.submit}
-                onClick={() => {
-                    history.push(`/`);
-                }}
-            >
-                Go Back
-            </Button>
+            <LinkButton url="/" text="Go Back!"/>
             <Grid container className={classes.root} spacing={2}>
                 {
                     trackersList.map((tracker) => <Tracker {...tracker} />)

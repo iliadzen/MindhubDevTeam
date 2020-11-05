@@ -5,8 +5,8 @@ import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
-import Button from '@material-ui/core/Button';
 
+import LinkButton from '../Common/LinkButton';
 
 const useStyles = makeStyles((theme) => ({
     card: {
@@ -23,17 +23,7 @@ const TrackerPreview = ({id, title, creationDate, modificationDate, customizatio
                 <h3>{title}</h3>
             </CardContent>
             <CardActions>
-                <Button
-                    fullWidth
-                    variant="contained"
-                    color="primary"
-                    className={classes.submit}
-                    onClick={() => {
-                        history.push(`/trackers/${id}`);
-                    }}
-                >
-                    Edit
-                </Button>
+                <LinkButton url={`/trackers/${id}`} text="See Detail" fullWidth={true}/>
             </CardActions>
         </Card>
     );

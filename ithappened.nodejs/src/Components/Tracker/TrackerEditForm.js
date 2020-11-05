@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import { makeStyles } from '@material-ui/core/styles';
@@ -15,7 +15,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const TrackerCard = ({tracker, onSubmit}) => {
+const TrackerEditForm = ({tracker, onSubmit}) => {
     const {id, title, creationDate, modificationDate, customizations} = tracker;
     const history = useHistory();
     const classes = useStyles();
@@ -24,9 +24,14 @@ const TrackerCard = ({tracker, onSubmit}) => {
         <Card className={classes.card}>
             <CardContent>
             <TextField
-                placeholder={`Name: ${title}`}
+                name="Title"
+                variant="outlined"
+                fullWidth
+                label="Title"
                 value={trackerName}
                 onChange={(e) => setTrackerName(e.target.value)}
+                placeholder={`${title}`}
+
             />
             </CardContent>
             <CardActions>
@@ -37,7 +42,6 @@ const TrackerCard = ({tracker, onSubmit}) => {
                 className={classes.submit}
                 onClick={() => {
                     onSubmit(trackerName, id);
-                    history.push(`/trackers/${id}`);
                 }}
             >
                 Submit
@@ -47,4 +51,4 @@ const TrackerCard = ({tracker, onSubmit}) => {
     );
 }
 
-export default TrackerCard;
+export default TrackerEditForm;
