@@ -54,6 +54,17 @@ export default function UserApp() {
     }, []);
     return (
     <Container component="main" maxWidth="xs">
+        <Button
+                style={{marginTop: "10px",}}
+                variant="contained"
+                color="primary"
+                className={classes.submit}
+                onClick={() => {
+                    history.push(`/`);
+                }}
+            >
+                Go Back
+        </Button>
         <CssBaseline />
         <div className={classes.paper}>
             <Avatar className={classes.avatar}>
