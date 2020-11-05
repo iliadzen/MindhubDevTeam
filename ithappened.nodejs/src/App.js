@@ -5,8 +5,9 @@ import UserApp from "./User/UserApp";
 import UserSignOut from "./User/UserSignOut";
 import UserEdit from "./User/UserEdit";
 import Trackers from "./Tracker/Trackers";
-import Tracker from "./Tracker/Trackers";
 import TrackerDetail from "./Tracker/TrackerDetail";
+import TrackerDelete from "./Tracker/TrackerDelete";
+import TrackerEdit from "./Tracker/TrackerEdit";
 
 const welcomeText = () => (
     <div>
@@ -43,6 +44,12 @@ const App = () => {
                     {!localStorage.getItem("accessToken") ? <Redirect to="/"/> : <UserEdit />}
                 </Route>
 
+                <Route path="/trackers/:trackerId/edit">
+                    {!localStorage.getItem("accessToken") ? <Redirect to="/"/> : <TrackerEdit />}
+                </Route>
+                <Route path="/trackers/:trackerId/delete">
+                    {!localStorage.getItem("accessToken") ? <Redirect to="/"/> : <TrackerDelete />}
+                </Route>
                 <Route path="/trackers/:trackerId">
                     {!localStorage.getItem("accessToken") ? <Redirect to="/"/> : <TrackerDetail />}
                 </Route>

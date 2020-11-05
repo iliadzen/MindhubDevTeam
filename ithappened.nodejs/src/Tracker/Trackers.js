@@ -1,23 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import {Link, useHistory} from 'react-router-dom';
+import {useHistory} from 'react-router-dom';
+
 import { makeStyles } from '@material-ui/core/styles';
 import { getTrackers } from '../Api.js'
 import Container from '@material-ui/core/Container';
-import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
-import Paper from '@material-ui/core/Paper';
+import Button from '@material-ui/core/Button';
+
+import Tracker from '../Components/Tracker/TrackerPreview';
 
 const useStyles = makeStyles((theme) => ({
-  root: {
-    flexGrow: 1,
-  },
-  paper: {
-      margin: "5px",
-      padding: "5px",
-  },
-  control: {
-    padding: theme.spacing(2),
-  },
+    root: {
+        flexGrow: 1,
+        marginTop: "6vh",
+    },
 }));
 
 export default function TrackersList() {
@@ -35,28 +31,23 @@ export default function TrackersList() {
         fetchTrackersList();
     }, []);
 
-    const [spacing, setSpacing] = React.useState(2);
-
     return (
         <Container component="main" spacing="9">
+            <Button
+                style={{marginTop: "10px",}}
+                variant="contained"
+                color="primary"
+                className={classes.submit}
+                onClick={() => {
+                    history.push(`/`);
+                }}
+            >
+                Go Back
+            </Button>
             <Grid container className={classes.root} spacing={2}>
-                {trackersList.map((tracker) => (
-                    <Grid item>
-                        <Paper className={classes.paper}>
-                            <p><b>{tracker.title}</b></p>
-                            <Button
-                                variant="contained"
-                                color="secondary"
-                                className={classes.submit}
-                                onClick={() => {
-                                    history.push("/trackers/"+tracker.id);
-                                }}
-                            >
-                                See Detail
-                            </Button>
-                        </Paper>
-                    </Grid>
-                ))}
+                {
+                    trackersList.map((tracker) => <Tracker {...tracker} />)
+                }
             </Grid>
         </Container>
     );
