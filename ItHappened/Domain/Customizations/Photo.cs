@@ -5,15 +5,19 @@ namespace ItHappened.Domain.Customizations
 {
     public class Photo : IEntity, IEventCustomizationData
     {
-        public Guid Id { get; }
-        public Guid EventId  { get; }
-        public byte[] File { get;  }
+        public Guid Id { get; private  set;}
+        public Guid EventId  { get; private  set; }
+        public byte[] Image { get; private  set; }
 
-        public Photo(Guid id, Guid eventId, string name, byte[] file)
+        public Photo(Guid id, Guid eventId, string name, byte[] image)
         {
             Id = id;
             EventId = eventId;
-            File = file;
+            Image = image;
+        }
+
+        public Photo()
+        {
         }
     }
 }

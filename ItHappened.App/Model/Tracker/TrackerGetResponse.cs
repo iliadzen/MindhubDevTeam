@@ -21,9 +21,11 @@ namespace ItHappened.App.Model
             Title = tracker.Title;
             CreationDate = tracker.CreationDate;
             ModificationDate = tracker.ModificationDate;
-            if(!tracker.Customizations.IsNull())
+            if (!tracker.Customizations.IsNull())
+            {
                 foreach (var customization in tracker.Customizations)
                     Customizations.Add(customization.ToString());
+            }
         }
     }
 }
