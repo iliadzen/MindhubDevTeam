@@ -10,9 +10,9 @@ namespace ItHappened.App.Model
         public string Title { get; }
         public DateTime CreationDate { get; }
         public DateTime ModificationDate { get; }
-        public List<ICustomizationGetResponse> Customizations { get; }
+        public CustomizationsGetResponses Customizations { get; }
 
-        public EventGetResponse(Event @event, List<ICustomizationGetResponse> customizations)
+        public EventGetResponse(Event @event, CustomizationsGetResponses customizations)
         {
             Id = @event.Id;
             Title = @event.Title;

@@ -20,14 +20,15 @@ namespace ItHappened.Application
 
         public Guid CreateEvent(Guid actorId, Guid trackerId, EventForm eventForm)
         {
-            if (eventForm.IsNull()) return Guid.Empty;
+            if (eventForm.IsNull() || !eventForm.IsCorrectlyFilled()) return Guid.Empty;
             var optionTracker = _trackerRepository.Get(trackerId);
             return optionTracker.Match(
                 Some: tracker =>
             {
                 if (actorId != tracker.UserId) return Guid.Empty;
                 var eventId = Guid.NewGuid();
-                var @event = new Event(eventId, trackerId, eventForm.Title, DateTime.Now, DateTime.Now);
+                var @event = new Event(eventId, trackerId, eventForm.Title, 
+                    DateTime.Now, DateTime.Now);
                 _eventRepository.Save(@event);
                 return eventId;
             },
@@ -64,7 +65,7 @@ namespace ItHappened.Application
         
         public void EditEvent(Guid actorId, Guid eventId, EventForm eventForm)
         {
-            if (eventForm.IsNull()) return;
+            if (eventForm.IsNull() || !eventForm.IsCorrectlyFilled()) return;
             var optionEvent = _eventRepository.Get(eventId);
             optionEvent.Do(@event =>
             {

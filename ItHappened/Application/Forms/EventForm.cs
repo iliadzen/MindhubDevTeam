@@ -1,6 +1,8 @@
+using Serilog;
+
 namespace ItHappened.Application
 {
-    public class EventForm
+    public class EventForm : IForm
     {
         public string Title { get; }
 
@@ -9,9 +11,12 @@ namespace ItHappened.Application
             Title = title;
         }
 
-        public bool IsNull()
+        public bool IsCorrectlyFilled()
         {
-            return Title == null;
+            if (!string.IsNullOrEmpty(Title))
+                return true;
+            Log.Error($"Event form filled incorrectly: string is null or empty.");
+            return false;
         }
     }
 }

@@ -29,13 +29,12 @@ namespace ItHappened.App.Controller
             var actorId = Guid.Parse(User.FindFirstValue(JwtClaimTypes.Id));
             var form = new EventForm(request.Title);
             var eventId = _eventService.CreateEvent(actorId, trackerId, form);
-            if (eventId != Guid.Empty)
-            {
-                if (!request.Customizations.IsNull())
-                    AddCustomizationsToEvent(actorId, trackerId, eventId, request.Customizations);
-            }
-            else
+            if (eventId == Guid.Empty)
                 return Ok("Tracker doesn't exists or no permissions to create.");
+            
+            if (!request.Customizations.IsNull())
+                    AddCustomizationsToEvent(actorId, trackerId, eventId, request.Customizations);
+            
             return Ok();
         }
         
@@ -47,7 +46,8 @@ namespace ItHappened.App.Controller
             var events = _eventService.GetEventsByTrackerId(actorId, trackerId);
             var response = new List<EventGetResponse>();
             foreach (var @event in events)
-                response.Add(new EventGetResponse(@event, new List<ICustomizationGetResponse>()));
+                response.Add(new EventGetResponse(@event, 
+                    FillCustomizationsGetResponses(actorId, @event.Id)));
             
             return Ok(response);
         }
@@ -61,7 +61,8 @@ namespace ItHappened.App.Controller
             return optionEvent.Match<IActionResult>(
                 Some: @event =>
                 {
-                    var response = new EventGetResponse(@event, new List<ICustomizationGetResponse>());
+                    var response = new EventGetResponse(@event, 
+                        FillCustomizationsGetResponses(actorId, eventId));
                     return Ok(response);
                 },
                 None: Ok(new
@@ -122,23 +123,39 @@ namespace ItHappened.App.Controller
         private void AddCustomizationsToEvent(Guid actorId, Guid trackerId, Guid eventId,
             CustomizationsCreateRequests createRequests)
         {
-            if(!createRequests.CommentCreateRequest.IsNull())
+            if(!createRequests.Comment.IsNull())
                 _customizationService.AddCommentToEvent(actorId, eventId, 
-                    new CommentForm(createRequests.CommentCreateRequest.Content));
+                    new CommentForm(createRequests.Comment.Content));
             
-            if(!createRequests.RatingCreateRequest.IsNull())
+            if(!createRequests.Rating.IsNull())
                 _customizationService.AddRatingToEvent(actorId, eventId,
-                    new RatingForm(createRequests.RatingCreateRequest.Stars));
+                    new RatingForm(createRequests.Rating.Stars));
             
-            if(!createRequests.ScaleCreateRequest.IsNull())
+            if(!createRequests.Scale.IsNull())
                 _customizationService.AddScaleToEvent(actorId, eventId, 
-                    new ScaleForm(createRequests.ScaleCreateRequest.Value));
+                    new ScaleForm(createRequests.Scale.Value));
                 
-            if(!createRequests.GeotagCreateRequest.IsNull())
+            if(!createRequests.Geotag.IsNull())
                 _customizationService.AddGeotagToEvent(actorId, eventId,
                     new GeotagForm(
-                        createRequests.GeotagCreateRequest.Longitude, 
-                        createRequests.GeotagCreateRequest.Latitude));
+                        createRequests.Geotag.Longitude, 
+                        createRequests.Geotag.Latitude));
+        }
+
+        private CustomizationsGetResponses FillCustomizationsGetResponses(Guid actorId, Guid eventId)
+        {
+            var response = new CustomizationsGetResponses();
+            var optionComment = _customizationService.GetComment(actorId, eventId);
+            var optionRating = _customizationService.GetRating(actorId, eventId);
+            var optionScale = _customizationService.GetScale(actorId, eventId);
+            var optionGeotag = _customizationService.GetGeotag(actorId, eventId);
+
+            optionComment.Do(comment => response.Comment = new CommentGetResponse(comment.Content));
+            optionRating.Do(rating => response.Rating = new RatingGetResponse((int)rating.Stars));
+            optionScale.Do(scale => response.Scale = new ScaleGetResponse(scale.Value));
+            optionGeotag.Do(tag => response.Geotag = 
+                new GeotagGetResponse(tag.Longitude, tag.Latitude));
+            return response;
         }
 
         private readonly IEventService _eventService;
