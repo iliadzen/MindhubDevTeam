@@ -123,40 +123,13 @@
 			"response": []
 		},
 		{
-			"name": "DeleteSelf",
-			"request": {
-				"method": "DELETE",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{baseUrl}}/users/self",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"users",
-						"self"
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "CreateTracker",
 			"request": {
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"title\":\"Test tracker\"}",
+					"raw": "{\r\n    \"title\":\"Test tracker\",\r\n    \"customizations\":\"[1,2,3,4]\"}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -262,7 +235,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"title\":\"Posted Some Shit from Postman again\"}",
+					"raw": "{\r\n    \"title\":\"Test event\",\r\n    \"customizations\": \r\n    {\r\n        \"Comment\": {\"Content\":\"Test comment\"},\r\n        \"Rating\": {\"Stars\":5},\r\n        \"Scale\": {\"Value\":100},\r\n        \"Geotag\": {\"Longitude\":38.52,\"Latitude\":77.11}\r\n    }\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -377,7 +350,7 @@
 		"bearer": [
 			{
 				"key": "token",
-				"value": "eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTI1NiIsInR5cCI6IkpXVCJ9.eyJJZCI6IjEwMWJlODk2LWIxZDgtNDYxNi1iZDhlLWFlNDIxOTllZjU3NSIsImV4cCI6MTYwNDM5NjkzMn0.GFdqRDALy4R0OSMEvzdebUAL-RJEOanuGqsxoMxEzX4",
+				"value": "eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTI1NiIsInR5cCI6IkpXVCJ9.eyJJZCI6ImFhZjAwNGJlLTkxNzItNGU5Zi1iNTE3LWFmNmRhMmFmYzQzYiIsImV4cCI6MTYxMDgxMzY0Nn0.eCwVDp9T8jrRVibw0P7gug_NpdEIx3GOgny3lnUAUa8",
 				"type": "string"
 			}
 		]
@@ -406,17 +379,17 @@
 	],
 	"variable": [
 		{
-			"id": "86998124-55c6-4538-af22-a9c77705435e",
+			"id": "3a5a3bed-5251-4257-afd9-1c2f044e0785",
 			"key": "baseUrl",
 			"value": "http://localhost:5000"
 		},
 		{
-			"id": "6a5e5e7b-2b52-46a5-9df4-b23a2997e31b",
+			"id": "3056ad3e-538a-43fa-87b6-df35ce6a1c5b",
 			"key": "trackerId",
-			"value": "0ec8c5ee-5837-40e8-af87-8d58384ab801"
+			"value": "8CE583AF-CF2A-4F71-9082-727B5EF568C6"
 		},
 		{
-			"id": "0cdcccdf-469b-4df0-9e2b-eae381eafb61",
+			"id": "d310cdaa-16d8-4e29-b6ed-315b28bc0d3c",
 			"key": "eventId",
 			"value": "8e5fb9cc-f32b-4710-a212-b8e08274b7d7"
 		}

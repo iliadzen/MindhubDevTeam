@@ -11,10 +11,10 @@ namespace ItHappened.Domain
         public string Title { get; set;  }
         public DateTime CreationDate { get; private set;  }
         public DateTime ModificationDate { get; set;  }
-        public ISet<CustomizationType> Customizations { get; set;  }
+        public List<CustomizationType> Customizations { get; set; }
 
         public Tracker(Guid id, Guid userId, string title, DateTime creationDate, 
-            DateTime modificationDate, ISet<CustomizationType> customizations)
+            DateTime modificationDate, List<CustomizationType> customizations)
         {
             Id = id;
             UserId = userId;

@@ -32,7 +32,7 @@ namespace ItHappened.Tests
         [Test]
         public void CreateEvent_ValidData_EventCreated()
         {
-            var eventContent = new EventContent("testTitle");
+            var eventContent = new EventForm("testTitle");
 
             _eventService.CreateEvent(_userOne.Id, _trackerUserOne.Id, eventContent);
 
@@ -44,7 +44,7 @@ namespace ItHappened.Tests
         [Test]
         public void CreateEvent_NullContent_EventNotCreated()
         {
-            var eventContent = new EventContent(null);
+            var eventContent = new EventForm(null);
 
             _eventService.CreateEvent(_userOne.Id, _trackerUserOne.Id, eventContent);
 
@@ -123,7 +123,7 @@ namespace ItHappened.Tests
         {
             var @event = EntityMaker.CreateSomeEvent(_trackerUserOne.Id, _mockEventRepository);
             
-            _eventService.EditEvent(_userOne.Id, @event.Id, new EventContent("2"));
+            _eventService.EditEvent(_userOne.Id, @event.Id, new EventForm("2"));
 
             var editedEvent = _mockEventRepository.Get(@event.Id).ValueUnsafe();
             Assert.AreEqual("2", editedEvent.Title);
@@ -134,7 +134,7 @@ namespace ItHappened.Tests
         {
             var @event = EntityMaker.CreateSomeEvent(_trackerUserOne.Id, _mockEventRepository);
             
-            _eventService.EditEvent(_userTwo.Id, @event.Id, new EventContent("2"));
+            _eventService.EditEvent(_userTwo.Id, @event.Id, new EventForm("2"));
 
             var editedEvent = _mockEventRepository.Get(@event.Id).ValueUnsafe();
             Assert.AreEqual(@event.Title, editedEvent.Title);
@@ -145,7 +145,7 @@ namespace ItHappened.Tests
         {
             var @event = EntityMaker.CreateSomeEvent(_trackerUserOne.Id, _mockEventRepository);
             
-            _eventService.EditEvent(_userOne.Id, Guid.NewGuid(), new EventContent("2"));
+            _eventService.EditEvent(_userOne.Id, Guid.NewGuid(), new EventForm("2"));
 
             Assert.Pass();
         }

@@ -4,6 +4,7 @@ using System.Security.Claims;
 using ItHappened.App.Authentication;
 using ItHappened.App.Model;
 using ItHappened.Application;
+using LanguageExt;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,9 +14,10 @@ namespace ItHappened.App.Controller
     [Route("trackers/{trackerId}")]
     public class EventController : ControllerBase
     {
-        public EventController(IEventService eventService)
+        public EventController(IEventService eventService, ICustomizationService customizationService)
         {
             _eventService = eventService;
+            _customizationService = customizationService;
         }
         
         [HttpPost]
@@ -23,9 +25,20 @@ namespace ItHappened.App.Controller
         public IActionResult CreateEvent([FromRoute] Guid trackerId, [FromBody] EventCreateRequest request)
         {
             var actorId = Guid.Parse(User.FindFirstValue(JwtClaimTypes.Id));
-            var form = new EventContent(request.Title);
-            _eventService.CreateEvent(actorId, trackerId, form);
-            return Ok();
+            var form = new EventForm(request.Title);
+            var eventId = _eventService.CreateEvent(actorId, trackerId, form);
+            if (eventId == Guid.Empty)
+                return NotFound(new
+                {
+                    errors = new
+                    {
+                        commonError = $"Tracker {trackerId} doesn't exists or no permissions to create."
+                    }
+                });
+            if (!request.Customizations.IsNull())
+                    AddCustomizationsToEvent(actorId, trackerId, eventId, request.Customizations);
+            
+            return NoContent();
         }
         
         [HttpGet]
@@ -36,7 +49,8 @@ namespace ItHappened.App.Controller
             var events = _eventService.GetEventsByTrackerId(actorId, trackerId);
             var response = new List<EventGetResponse>();
             foreach (var @event in events)
-                response.Add(new EventGetResponse(@event));
+                response.Add(new EventGetResponse(@event, 
+                    FillCustomizationsGetResponses(actorId, @event.Id)));
             
             return Ok(response);
         }
@@ -50,14 +64,15 @@ namespace ItHappened.App.Controller
             return optionEvent.Match<IActionResult>(
                 Some: @event =>
                 {
-                    var response = new EventGetResponse(@event);
+                    var response = new EventGetResponse(@event, 
+                        FillCustomizationsGetResponses(actorId, eventId));
                     return Ok(response);
                 },
-                None: Ok(new
+                None: NotFound(new
                     {
                         errors = new
                         {
-                            commonError = "Event doesn't exist or no permissions to get."
+                            commonError = "Event doesn't exist."
                         }
                     }
                 ));
@@ -72,15 +87,15 @@ namespace ItHappened.App.Controller
             return optionEvent.Match<IActionResult>(
                 Some: tracker =>
                 {
-                    var form = new EventContent(request.Title);
+                    var form = new EventForm(request.Title);
                     _eventService.EditEvent(actorId, eventId, form);
-                    return Ok();
+                    return NoContent();
                 },
-                None: Ok(new
+                None: NotFound(new
                     {
                         errors = new
                         {
-                            commonError = "Event doesn't exist or no permissions to edit."
+                            commonError = "Event doesn't exist."
                         }
                     }
                 ));
@@ -96,18 +111,57 @@ namespace ItHappened.App.Controller
                 Some: @event =>
                 {
                     _eventService.DeleteEvent(actorId, eventId);
-                    return Ok();
+                    return NoContent();
                 },
-                None: Ok(new
+                None: NotFound(new
                     {
                         errors = new
                         {
-                            commonError = "Event doesn't exist or no permissions to delete."
+                            commonError = "Event doesn't exist."
                         }
                     }
                 ));
         }
 
+        private void AddCustomizationsToEvent(Guid actorId, Guid trackerId, Guid eventId,
+            CustomizationsCreateRequests createRequests)
+        {
+            if(!createRequests.Comment.IsNull())
+                _customizationService.AddCommentToEvent(actorId, eventId, 
+                    new CommentForm(createRequests.Comment.Content));
+            
+            if(!createRequests.Rating.IsNull())
+                _customizationService.AddRatingToEvent(actorId, eventId,
+                    new RatingForm(createRequests.Rating.Stars));
+            
+            if(!createRequests.Scale.IsNull())
+                _customizationService.AddScaleToEvent(actorId, eventId, 
+                    new ScaleForm(createRequests.Scale.Value));
+                
+            if(!createRequests.Geotag.IsNull())
+                _customizationService.AddGeotagToEvent(actorId, eventId,
+                    new GeotagForm(
+                        createRequests.Geotag.Longitude, 
+                        createRequests.Geotag.Latitude));
+        }
+
+        private CustomizationsGetResponses FillCustomizationsGetResponses(Guid actorId, Guid eventId)
+        {
+            var response = new CustomizationsGetResponses();
+            var optionComment = _customizationService.GetComment(actorId, eventId);
+            var optionRating = _customizationService.GetRating(actorId, eventId);
+            var optionScale = _customizationService.GetScale(actorId, eventId);
+            var optionGeotag = _customizationService.GetGeotag(actorId, eventId);
+
+            optionComment.Do(comment => response.Comment = new CommentGetResponse(comment.Content));
+            optionRating.Do(rating => response.Rating = new RatingGetResponse((int)rating.Stars));
+            optionScale.Do(scale => response.Scale = new ScaleGetResponse(scale.Value));
+            optionGeotag.Do(tag => response.Geotag = 
+                new GeotagGetResponse(tag.Longitude, tag.Latitude));
+            return response;
+        }
+
         private readonly IEventService _eventService;
+        private readonly ICustomizationService _customizationService;
     }
 }

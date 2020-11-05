@@ -31,11 +31,11 @@ namespace ItHappened.App.Controller
                     var response = new TrackerGetResponse(tracker);
                     return Ok(response);
                 },
-                None: Ok(new
+                None: NotFound(new
                     {
                         errors = new
                         {
-                            commonError = "Tracker doesn't exist or no permissions to get."
+                            commonError = "Tracker doesn't exist."
                         }
                     }
                 ));
@@ -46,9 +46,9 @@ namespace ItHappened.App.Controller
         public IActionResult CreateTracker([FromBody] TrackerCreateRequest request)
         {
             var actorId = Guid.Parse(User.FindFirstValue(JwtClaimTypes.Id));
-            var form = new TrackerForm(request.Title, new HashSet<CustomizationType>());
+            var form = new TrackerForm(request.Title, request.Customizations);
             _trackerService.CreateTracker(actorId, form);
-            return Ok();
+            return NoContent();
         }
         
         [HttpGet]
@@ -72,15 +72,15 @@ namespace ItHappened.App.Controller
             return optionTracker.Match<IActionResult>(
                 Some: tracker =>
                 {
-                    var form = new TrackerForm(request.Title, new HashSet<CustomizationType>());
+                    var form = new TrackerForm(request.Title, "");
                     _trackerService.EditTracker(actorId, trackerId, form);
-                    return Ok();
+                    return NoContent();
                 },
-                None: Ok(new
+                None: NotFound(new
                     {
                         errors = new
                         {
-                            commonError = "Tracker doesn't exist or no permissions to edit."
+                            commonError = "Tracker doesn't exist."
                         }
                     }
                 ));
@@ -96,18 +96,18 @@ namespace ItHappened.App.Controller
                 Some: tracker =>
                 {
                     _trackerService.DeleteTracker(actorId, trackerId);
-                    return Ok();
+                    return NoContent();
                 },
-                None: Ok(new
+                None: NotFound(new
                     {
                         errors = new
                         {
-                            commonError = "Tracker doesn't exist or no permissions to delete."
+                            commonError = "Tracker doesn't exist."
                         }
                     }
                 ));
         }
-        
+
         private readonly ITrackerService _trackerService;
     }
 }

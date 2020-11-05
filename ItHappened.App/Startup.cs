@@ -58,7 +58,12 @@ namespace ItHappened.App
             services.AddScoped<IRepository<License>, LicenseRepository>();
             services.AddScoped<IRepository<Tracker>, TrackerRepository>();
             services.AddScoped<IRepository<Event>, EventRepository>();
+            
             services.AddScoped<IRepository<Comment>, CommentRepository>();
+            services.AddScoped<IRepository<Rating>, RatingRepository>();
+            services.AddScoped<IRepository<Scale>, ScaleRepository>();
+            services.AddScoped<IRepository<Geotag>, GeotagRepository>();
+            services.AddScoped<IRepository<Photo>, PhotoRepository>();
 
             // Utils
             services.AddScoped<IJwtIssuer, JwtIssuer>();
@@ -71,6 +76,7 @@ namespace ItHappened.App
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ITrackerService, TrackerService>();
             services.AddScoped<IEventService, EventService>();
+            services.AddScoped<ICustomizationService, CustomizationService>();
             
             // Controllers
             services.AddControllers(options =>

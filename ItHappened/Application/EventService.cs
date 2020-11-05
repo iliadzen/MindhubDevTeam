@@ -18,17 +18,21 @@ namespace ItHappened.Application
             _trackerRepository = trackerRepository;
         }
 
-        public void CreateEvent(Guid actorId, Guid trackerId, EventContent eventContent)
+        public Guid CreateEvent(Guid actorId, Guid trackerId, EventForm eventForm)
         {
-            if (eventContent.IsNull()) return;
+            if (eventForm.IsNull() || !eventForm.IsCorrectlyFilled()) return Guid.Empty;
             var optionTracker = _trackerRepository.Get(trackerId);
-            optionTracker.Do(tracker =>
+            return optionTracker.Match(
+                Some: tracker =>
             {
-                if (actorId != tracker.UserId) return;
+                if (actorId != tracker.UserId) return Guid.Empty;
                 var eventId = Guid.NewGuid();
-                var @event = new Event(eventId, trackerId, eventContent.Title, DateTime.Now, DateTime.Now);
+                var @event = new Event(eventId, trackerId, eventForm.Title, 
+                    DateTime.Now, DateTime.Now);
                 _eventRepository.Save(@event);
-            }); }
+                return eventId;
+            },
+                None: Guid.Empty); }
         
         public Option<Event> GetEvent(Guid actorId, Guid eventId)
         {
@@ -59,9 +63,9 @@ namespace ItHappened.Application
                 None: new ReadOnlyCollection<Event>(new List<Event>()));
         }
         
-        public void EditEvent(Guid actorId, Guid eventId, EventContent eventContent)
+        public void EditEvent(Guid actorId, Guid eventId, EventForm eventForm)
         {
-            if (eventContent.IsNull()) return;
+            if (eventForm.IsNull() || !eventForm.IsCorrectlyFilled()) return;
             var optionEvent = _eventRepository.Get(eventId);
             optionEvent.Do(@event =>
             {
@@ -69,7 +73,7 @@ namespace ItHappened.Application
                 optionTracker.Do(tracker =>
                 {
                     if (actorId != tracker.UserId) return;
-                    @event.Title = eventContent.Title;
+                    @event.Title = eventForm.Title;
                     @event.ModificationDate = DateTime.Now;
                     _eventRepository.Update(@event);
 

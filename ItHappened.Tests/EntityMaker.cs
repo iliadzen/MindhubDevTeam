@@ -28,7 +28,7 @@ namespace ItHappened.Tests
                 $"{trackerId}", 
                 DateTime.Now, 
                 DateTime.Now, 
-                new HashSet<CustomizationType>());
+                new List<CustomizationType>());
             repository.Save(tracker);
             
             return tracker;

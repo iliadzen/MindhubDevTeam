@@ -14,15 +14,19 @@ namespace ItHappened.Domain.Customizations
             Five = 5
         }
         
-        public Guid Id { get; }
-        public Guid EventId  { get; }
-        public StarsRating Stars { get; }
+        public Guid Id { get; private set; }
+        public Guid EventId  { get; private set; }
+        public StarsRating Stars { get; private set; }
 
         public Rating(Guid id, Guid eventId, StarsRating stars)
         {
             Id = id;
             EventId = eventId;
             Stars = stars;
+        }
+
+        public Rating()
+        {
         }
     }
 }
