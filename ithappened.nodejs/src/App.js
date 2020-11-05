@@ -4,6 +4,9 @@ import UserSignIn from "./User/UserSignIn";
 import UserApp from "./User/UserApp";
 import UserSignOut from "./User/UserSignOut";
 import UserEdit from "./User/UserEdit";
+import Trackers from "./Tracker/Trackers";
+import Tracker from "./Tracker/Trackers";
+import TrackerDetail from "./Tracker/TrackerDetail";
 
 const welcomeText = () => (
     <div>
@@ -13,6 +16,9 @@ const welcomeText = () => (
             <li><a href="users/signin">Sign In</a></li>
             <li><a href="users/signout">Sign Out</a></li>
             <li><a href="users/self">Profile</a></li>
+            <hr></hr>
+            <li><a href="trackers/create">Create Tracker</a></li>
+            <li><a href="trackers">All Trackers</a></li>
         </ul>
     </div>
 );
@@ -36,9 +42,14 @@ const App = () => {
                 <Route path="/users/edit">
                     {!localStorage.getItem("accessToken") ? <Redirect to="/"/> : <UserEdit />}
                 </Route>
-                {/* <Route path="/users/signout">
-                    {localStorage.getItem("accessToken") ? localStorage.removeItem("accessToken") : []}
-                </Route> */}
+
+                <Route path="/trackers/:trackerId">
+                    {!localStorage.getItem("accessToken") ? <Redirect to="/"/> : <TrackerDetail />}
+                </Route>
+                <Route path="/trackers">
+                    {!localStorage.getItem("accessToken") ? <Redirect to="/"/> : <Trackers />}
+                </Route>
+
                 <Route path="/" component={welcomeText}/>
             </Switch>
         </BrowserRouter>
