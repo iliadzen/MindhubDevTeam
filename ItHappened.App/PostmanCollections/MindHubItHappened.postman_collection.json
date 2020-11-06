@@ -343,6 +343,41 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "GetUserStatistics",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/stats",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"stats"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetTrackerStatistics",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/stats/{{trackerId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"stats",
+						"{{trackerId}}"
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"auth": {
@@ -379,17 +414,17 @@
 	],
 	"variable": [
 		{
-			"id": "3a5a3bed-5251-4257-afd9-1c2f044e0785",
+			"id": "808343eb-4e38-4af5-bc99-1dfbdcfdcaab",
 			"key": "baseUrl",
 			"value": "http://localhost:5000"
 		},
 		{
-			"id": "3056ad3e-538a-43fa-87b6-df35ce6a1c5b",
+			"id": "9fbc33f4-ea2d-4e40-8816-103757be8373",
 			"key": "trackerId",
 			"value": "8CE583AF-CF2A-4F71-9082-727B5EF568C6"
 		},
 		{
-			"id": "d310cdaa-16d8-4e29-b6ed-315b28bc0d3c",
+			"id": "d833ddad-71c1-4c6c-be00-f9293fb071dd",
 			"key": "eventId",
 			"value": "8e5fb9cc-f32b-4710-a212-b8e08274b7d7"
 		}
