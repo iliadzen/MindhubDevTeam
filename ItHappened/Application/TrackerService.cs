@@ -27,7 +27,7 @@ namespace ItHappened.Application
 
         public void EditTracker(Guid actorId, Guid trackerId, TrackerForm form)
         {
-            if (!form.IsNull()) return;
+            if (form.IsNull()) return;
             var oldTracker = _trackersRepository.Get(trackerId);
             oldTracker.Do(tracker =>
             {
@@ -71,7 +71,7 @@ namespace ItHappened.Application
             return optionTracker.Match(
                 Some: tracker =>
                 {
-                    if (actorId != optionTracker.ValueUnsafe().UserId)
+                    if (actorId != tracker.UserId)
                     {
                         Log.Error($"User {actorId} tried to get someone else's tracker");
                         return Option<Tracker>.None;
