@@ -235,7 +235,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"title\":\"Test event\",\r\n    \"customizations\": \r\n    {\r\n        \"Comment\": {\"Content\":\"Test comment\"},\r\n        \"Rating\": {\"Stars\":5},\r\n        \"Scale\": {\"Value\":100},\r\n        \"Geotag\": {\"Longitude\":38.52,\"Latitude\":77.11}\r\n    }\r\n}",
+					"raw": "{\r\n    \"title\":\"Test event\",\r\n    \"customizations\": \r\n    {\r\n        \"Comment\": {\"Content\":\"Test comment\"},\r\n        \"Rating\": {\"Stars\":5},\r\n        \"Scale\": {\"Value\":100},\r\n        \"Geotag\": {\"Longitude\":38.52,\"Latitude\":77.11},\r\n        \"Photo\": {\"DataUrl\": \"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAIAAAACDbGyAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAkSURBVBhXY/h/lOG/GcN/BigCc5CEwBSSEFQYLgTjQ4SOMgAA2vMecRdhX/cAAAAASUVORK5CYII=\"}\r\n    }\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -343,6 +343,41 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "GetUserStatistics",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/stats",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"stats"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetTrackerStatistics",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/stats/{{trackerId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"stats",
+						"{{trackerId}}"
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"auth": {
@@ -379,17 +414,17 @@
 	],
 	"variable": [
 		{
-			"id": "3a5a3bed-5251-4257-afd9-1c2f044e0785",
+			"id": "6135fe0b-f689-45e8-ae0e-1f09353a8415",
 			"key": "baseUrl",
 			"value": "http://localhost:5000"
 		},
 		{
-			"id": "3056ad3e-538a-43fa-87b6-df35ce6a1c5b",
+			"id": "b687446c-2063-40b2-93c8-9e022c7e43b7",
 			"key": "trackerId",
-			"value": "8CE583AF-CF2A-4F71-9082-727B5EF568C6"
+			"value": "98C145C7-E4A5-4D2F-B79E-DD6E2CA4FCEE"
 		},
 		{
-			"id": "d310cdaa-16d8-4e29-b6ed-315b28bc0d3c",
+			"id": "b0a4c156-a23f-4c6a-8c5d-c3f98af097d2",
 			"key": "eventId",
 			"value": "8e5fb9cc-f32b-4710-a212-b8e08274b7d7"
 		}

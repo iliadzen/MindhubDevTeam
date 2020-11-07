@@ -6,5 +6,6 @@ namespace ItHappened.App.Model
         public CommentCreateRequest Comment { get; set; }
         public ScaleCreateRequest Scale { get; set; }
         public RatingCreateRequest Rating { get; set; }
+        public PhotoCreateRequest Photo { get; set; }
     }
 }
