@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 
-namespace ItHappened.App.Controller
+namespace ItHappened.App.Controllers
 {
     [Route("users")]
     public class UserController : ControllerBase

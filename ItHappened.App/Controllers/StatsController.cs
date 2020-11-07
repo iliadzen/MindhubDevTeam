@@ -10,7 +10,7 @@ using LanguageExt.UnsafeValueAccess;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ItHappened.App.Controller
+namespace ItHappened.App.Controllers
 {
     [Authorize]
     [Route("stats")]

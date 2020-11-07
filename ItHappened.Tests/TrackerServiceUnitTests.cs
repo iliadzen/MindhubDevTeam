@@ -19,7 +19,7 @@ namespace ItHappened.Tests
             _someonesId = Guid.NewGuid();
             _mockTrackerRepository = new RepositoryMock<Tracker>();
             _mockEventRepository = new RepositoryMock<Event>();
-            _trackerService = new TrackerService(_mockTrackerRepository, _mockEventRepository);
+            _trackerService = new TrackerService(_mockTrackerRepository);
         }
         [Test]
         public void GetTracker_UserGetsOwnTracker_GotTracker()
@@ -67,35 +67,24 @@ namespace ItHappened.Tests
         }
         
         [Test]
-        public void DeleteTracker_UserDeletesOwnTracker_TrackerAndItsEventsWereDeleted()
+        public void DeleteTracker_UserDeletesOwnTracker_TrackerWasDeleted()
         {
             var userTracker = EntityMaker.CreateSomeTracker(_userId, _mockTrackerRepository);
-            EntityMaker.CreateSomeTracker(_someonesId, _mockTrackerRepository);
-            EntityMaker.CreateSomeEvent(userTracker.Id, _mockEventRepository);
-            EntityMaker.CreateSomeEvent(userTracker.Id, _mockEventRepository);
-            EntityMaker.CreateSomeEvent(_someonesId, _mockEventRepository);
 
             _trackerService.DeleteTracker(_userId, userTracker.Id);
             
             var trackers = _mockTrackerRepository.GetAll();
-            var events = _mockEventRepository.GetAll();
-            Assert.AreEqual(1, trackers.Count);
-            Assert.AreEqual(1, events.Count);
+            Assert.AreEqual(0, trackers.Count);
         }
         
         [Test]
-        public void DeleteTracker_UserDeletesSomeonesTracker_TrackerAndItsEventsWereNotDeleted()
+        public void DeleteTracker_UserDeletesSomeonesTracker_TrackerWasNotDeleted()
         {
             var someonesTracker = EntityMaker.CreateSomeTracker(_someonesId, _mockTrackerRepository);
-            EntityMaker.CreateSomeEvent(someonesTracker.Id, _mockEventRepository);
-            EntityMaker.CreateSomeEvent(someonesTracker.Id, _mockEventRepository);
-
             _trackerService.DeleteTracker(_userId, someonesTracker.Id);
             
             var trackers = _mockTrackerRepository.GetAll();
-            var events = _mockEventRepository.GetAll();
             Assert.AreEqual(1, trackers.Count);
-            Assert.AreEqual(2, events.Count);
             Assert.AreEqual(someonesTracker.Title, trackers.ElementAt(0).Title);
         }
 
