@@ -21,7 +21,7 @@ export const createTracker = (trackerTitle, trackerCustomizations) => instance.p
 
 // Event
 export const createEvent = (trackerId, data) => instance.post(`/trackers/${trackerId}/events`, data, authorizedRequestConfig).then(result => result.data);
-export const editEvent = (trackerId, eventId, eventTitle, eventCustomizations) => instance.put(`/trackers/${trackerId}/events/${eventId}`, {title: eventTitle, customizations: eventCustomizations}, authorizedRequestConfig).then(result => result.data);
+export const editEvent = (trackerId, eventId, eventTitle) => instance.put(`/trackers/${trackerId}/events/${eventId}`, {title: eventTitle}, authorizedRequestConfig).then(result => result.data);
 export const deleteEvent = (trackerId, eventId) => instance.delete(`/trackers/${trackerId}/events/${eventId}`, authorizedRequestConfig).then(result => result.data);
 export const getEvents = (trackerId) => instance.get(`/trackers/${trackerId}/events`, authorizedRequestConfig).then(result => result.data);
 export const getEvent = (trackerId, eventId) => instance.get(`/trackers/${trackerId}/events/${eventId}`, authorizedRequestConfig).then(result => result.data);

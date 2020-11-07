@@ -12,7 +12,7 @@ import CommentReadonly from './Customization/CommentReadonly';
 import GeotagReadonly from './Customization/GeotagReadonly';
 import ScaleReadonly from './Customization/ScaleReadonly';
 import RatingReadonly from './Customization/RatingReadonly';
-// import PhotoBase64 from './Customization/PhotoBase64';
+import PhotoBase64 from './Customization/PhotoBase64';
 const useStyles = makeStyles((theme) => ({
     card: {
         margin: "50px 20px 5px 20px",
@@ -25,9 +25,9 @@ const EventCard = ({trackerId, id, title, creationDate, modificationDate, custom
 
     console.log(customizations);
     
-    const handleDelete = async (id) => {
-        await deleteEvent(id);
-        history.push(`/trackers`);
+    const handleDelete = async (trackerId, id) => {
+        await deleteEvent(trackerId, id);
+        history.push(`/trackers/${trackerId}`);
     }
 
     return (
@@ -41,19 +41,19 @@ const EventCard = ({trackerId, id, title, creationDate, modificationDate, custom
                 <h3>More about:</h3>
                 {customizations.comment != null ? <CommentReadonly value={customizations.comment.content} /> : []}
                 {customizations.geotag != null ? <GeotagReadonly geotag={customizations.geotag} /> : []}
-                {/* {customizations.photo != null ? <PhotoBase64 data={customizations.photo.DataUrl} /> : []} */}
+                {customizations.photo != null ? <PhotoBase64 data={customizations.photo.dataUrl} /> : []}
                 {customizations.rating != null ? <RatingReadonly stars={customizations.rating.stars} /> : []}
                 {customizations.scale != null ? <ScaleReadonly value={customizations.scale.value} /> : []}
             </CardContent>
             <CardActions>
-                <LinkButton url={`/trackers/${id}/edit`} text="Edit" fullWidth={true}/>
+                <LinkButton url={`/trackers/${trackerId}/events/${id}/edit`} text="Edit" fullWidth={true}/>
                 <Button
                     fullWidth
                     variant="contained"
                     color="secondary"
                     style={{marginTop: "10px",}}
                     onClick={() => {
-                        handleDelete(id);
+                        handleDelete(trackerId, id);
                     }}
                 >
                     Delete

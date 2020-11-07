@@ -54,7 +54,7 @@ const EventCreateForm = ({tracker, onSubmit}) => {
             Latitude: 0,
         },
         Photo: {
-            Photo: ""
+            DataUrl: ""
         },
     });
 
@@ -65,7 +65,7 @@ const EventCreateForm = ({tracker, onSubmit}) => {
         setCustomizations({...eventCustomizations, Geotag: geotag})
     };
     const handlePhotoChange = (binary) => {
-        setCustomizations({...eventCustomizations, Photo: {Photo: binary}})
+        setCustomizations({...eventCustomizations, Photo: {DataUrl: binary}})
     };
     const handleRatingChange = (rating) => {
         setCustomizations({...eventCustomizations, Rating: {Stars: rating}})

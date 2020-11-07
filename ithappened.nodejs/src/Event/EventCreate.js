@@ -43,6 +43,7 @@ const EventCreate = () => {
             customizations: eventCustomizations
         }
         console.log(request);
+        await eventCustomizations.Photo.DataUrl;
         await createEvent(tracker.id, request);
         history.push(`/trackers/${trackerId}`);
 
