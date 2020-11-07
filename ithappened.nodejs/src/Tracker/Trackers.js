@@ -33,7 +33,8 @@ export default function TrackersList() {
 
     return (
         <Container component="main" spacing="9">
-            <LinkButton url="/" text="Go Back!"/>
+            <LinkButton url="/" text="Go Back!"/><hr></hr>
+            <LinkButton url={'trackers/create'} color="secondary" text="Create Tracker"/>
             <Grid container className={classes.root} spacing={2}>
                 {
                     trackersList.map((tracker) => <TrackerPreview {...tracker} />)
