@@ -39,7 +39,7 @@ export default function EventEdit() {
     return (
         <Container component="main" maxWidth="xs">
             <LinkButton url={`/trackers/${trackerId}/events/${eventId}`} text="Go Back!" />
-            <EventEditForm className={classes.root} {...event} onSubmit={handleEdit}/>
+            <EventEditForm className={classes.root} {...event} onSubmit={handleEdit} trackerId={trackerId}/>
         </Container>
     );
 }

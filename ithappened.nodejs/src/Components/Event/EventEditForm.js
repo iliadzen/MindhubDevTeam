@@ -18,6 +18,7 @@ const useStyles = makeStyles((theme) => ({
 const EventEditForm = ({trackerId, id, title, creationDate, modificationDate, customizations, onSubmit}) => {
     const history = useHistory();
     const classes = useStyles();
+    console.log(trackerId);
     const [eventTitle, setEventTitle] = useState("");
     return (
         <Card className={classes.card}>
