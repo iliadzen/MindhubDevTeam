@@ -9,7 +9,7 @@ import Button from '@material-ui/core/Button';
 import { TextField } from '@material-ui/core';
 import CommentForm from './Customization/CommentForm';
 import GeotagForm from './Customization/GeotagForm';
-// import PhotoForm from './Customization/PhotoForm';
+import PhotoForm from './Customization/PhotoForm';
 import RatingForm from './Customization/RatingForm';
 import ScaleForm from './Customization/ScaleForm';
 
@@ -21,7 +21,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const TrackerCreateForm = ({tracker, onSubmit}) => {
+const EventCreateForm = ({tracker, onSubmit}) => {
     const history = useHistory();
     const classes = useStyles();
     const [trackerLoaded, setTracker] = useState({
@@ -53,9 +53,9 @@ const TrackerCreateForm = ({tracker, onSubmit}) => {
             Longitude: 0,
             Latitude: 0,
         },
-        // Photo: {
-        //     Photo: ""
-        // },
+        Photo: {
+            Photo: ""
+        },
     });
 
     const handleCommentChange = (value) => {
@@ -64,9 +64,9 @@ const TrackerCreateForm = ({tracker, onSubmit}) => {
     const handleGeotagChange = (geotag) => {
         setCustomizations({...eventCustomizations, Geotag: geotag})
     };
-    // const handlePhotoChange = (binary) => {
-    //     setCustomizations({...eventCustomizations, Photo: {Photo: binary}})
-    // };
+    const handlePhotoChange = (binary) => {
+        setCustomizations({...eventCustomizations, Photo: {Photo: binary}})
+    };
     const handleRatingChange = (rating) => {
         setCustomizations({...eventCustomizations, Rating: {Stars: rating}})
     };
@@ -92,7 +92,7 @@ const TrackerCreateForm = ({tracker, onSubmit}) => {
                 
             {tracker.customizations.includes("Comment") ? <CommentForm handler={handleCommentChange} value={eventCustomizations.Comment.Content}/> : [] }
             {tracker.customizations.includes("Geotag") ? <GeotagForm handler={handleGeotagChange}/> : [] }
-            {/* tracker.customizations.includes("Photo") ? <PhotoForm handler={handlePhotoChange}/> : [] } */}
+            {tracker.customizations.includes("Photo") ? <PhotoForm handler={handlePhotoChange}/> : [] }
             {tracker.customizations.includes("Rating") ? <RatingForm value={eventCustomizations.Rating.Stars} handler={handleRatingChange}/> : [] }
             {tracker.customizations.includes("Scale") ? <ScaleForm value={eventCustomizations.Scale.Value} handler={handleScaleChange}/> : [] }
                 
@@ -114,4 +114,4 @@ const TrackerCreateForm = ({tracker, onSubmit}) => {
     );
 }
 
-export default TrackerCreateForm;
+export default EventCreateForm;

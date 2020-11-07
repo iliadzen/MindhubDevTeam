@@ -6,14 +6,14 @@ import { TextField } from '@material-ui/core';
 const PhotoForm = ({handler, value}) => {
     const toBinary = file => new Promise((resolve, reject) => {
         const reader = new FileReader();
-        reader.readAsArrayBuffer(file);
+        reader.readAsDataURL(file);
         reader.onload = () => resolve(reader.result);
         reader.onerror = error => reject(error);
     });
 
-    const waitFile = async (file) => {
+    const waitAndSubmit = async (file) => {
         var result = await file;
-        return result
+        handler(result);
     }
 
     return (
@@ -27,8 +27,7 @@ const PhotoForm = ({handler, value}) => {
                 onChange={(e) => {
                     if (e.target.files.length != 0) {
                         const file = Array.from(e.target.files)[0]
-                        const binaryFile = waitFile(toBinary(file))
-                        handler(binaryFile);
+                        waitAndSubmit(toBinary(file))
                     }                    
                 }}
             />

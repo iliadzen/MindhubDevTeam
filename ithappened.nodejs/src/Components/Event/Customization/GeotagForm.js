@@ -24,8 +24,8 @@ const GeotagForm = ({handler}) => {
 
               let newMapState = { center: [a, b]}
               let geotag = {
-                Latitude: a,
-                Longitude: b
+                Latitude: parseFloat(a),
+                Longitude: parseFloat(b)
               }
               handler(geotag)
             }}

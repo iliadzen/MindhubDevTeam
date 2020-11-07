@@ -44,6 +44,7 @@ const EventCreate = () => {
         }
         console.log(request);
         await createEvent(tracker.id, request);
+        history.push(`/trackers/${trackerId}`);
 
     }
     
