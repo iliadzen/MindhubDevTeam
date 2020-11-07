@@ -19,7 +19,7 @@ namespace ItHappened.Tests
             _someonesId = Guid.NewGuid();
             _mockTrackerRepository = new RepositoryMock<Tracker>();
             _mockEventRepository = new RepositoryMock<Event>();
-            _trackerService = new TrackerService(_mockTrackerRepository, _mockEventRepository);
+            _trackerService = new TrackerService(_mockTrackerRepository);
         }
         [Test]
         public void GetTracker_UserGetsOwnTracker_GotTracker()

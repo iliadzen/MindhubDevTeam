@@ -57,8 +57,8 @@ namespace ItHappened.Application
                     ? _eventRepository
                         .GetAll()
                         .Where(@event => @event.TrackerId == trackerId)
-                        .ToList()
-                        .AsReadOnly()
+                        .OrderBy(@event => @event.CreationDate)
+                        .ToList().AsReadOnly()
                     : new ReadOnlyCollection<Event>(new List<Event>()),
                 None: new ReadOnlyCollection<Event>(new List<Event>()));
         }

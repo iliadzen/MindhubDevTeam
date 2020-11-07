@@ -11,41 +11,36 @@ namespace ItHappened.Application
 {
     public class TrackerService : ITrackerService
     {
-        public TrackerService(IRepository<Tracker> trackersRepository, IRepository<Event> eventsRepository)
+        public TrackerService(IRepository<Tracker> trackersRepository)
         {
             _trackersRepository = trackersRepository;
-            _eventsRepository = eventsRepository;
         }
+
         public void CreateTracker(Guid actorId, TrackerForm form)
         {
-            if (!form.IsNull())
-            {
-                var tracker = new Tracker(Guid.NewGuid(), actorId, form.Title, DateTime.Now,
-                    DateTime.Now, 
-                    JsonConvert.DeserializeObject<List<CustomizationType>>(form.Customizations));
-                _trackersRepository.Save(tracker);
-            }
+            if (form.IsNull()) return;
+            var tracker = new Tracker(Guid.NewGuid(), actorId, form.Title, DateTime.Now,
+                DateTime.Now,
+                JsonConvert.DeserializeObject<List<CustomizationType>>(form.Customizations));
+            _trackersRepository.Save(tracker);
         }
 
         public void EditTracker(Guid actorId, Guid trackerId, TrackerForm form)
         {
-            if (!form.IsNull())
+            if (!form.IsNull()) return;
+            var oldTracker = _trackersRepository.Get(trackerId);
+            oldTracker.Do(tracker =>
             {
-                var oldTracker = _trackersRepository.Get(trackerId);
-                oldTracker.Do(tracker =>
+                if (actorId != tracker.UserId)
                 {
-                    if (actorId != tracker.UserId)
-                    {
-                        Log.Error($"User {actorId} tried to edit someone else's tracker");
-                        return;
-                    }
+                    Log.Error($"User {actorId} tried to edit someone else's tracker");
+                    return;
+                }
 
-                    //tracker.Customizations = form.Customizations;
-                    tracker.Title = form.Title;
-                    tracker.ModificationDate = DateTime.Now;
-                    _trackersRepository.Update(tracker);
-                });
-            }
+                tracker.Title = form.Title;
+                tracker.ModificationDate = DateTime.Now;
+                _trackersRepository.Update(tracker);
+            });
         }
 
         public void DeleteTracker(Guid actorId, Guid trackerId)
@@ -58,23 +53,16 @@ namespace ItHappened.Application
                     Log.Error($"User {actorId} tried to delete someone else's tracker");
                     return;
                 }
-                DeleteTrackersEvents(trackerId);
                 _trackersRepository.Delete(trackerId);
             });
         }
 
-        private void DeleteTrackersEvents(Guid trackerId)
-        {
-            var trackersEvents = _eventsRepository.GetAll()
-                .Where(@event => @event.TrackerId == trackerId).ToList().AsReadOnly();
-            foreach (var @event in trackersEvents)
-                _eventsRepository.Delete(@event.Id);
-        }
-        
         public IReadOnlyCollection<Tracker> GetUserTrackers(Guid userId)
         {
             var trackers = _trackersRepository.GetAll();
-            return trackers.Where(tracker => tracker.UserId == userId).ToList().AsReadOnly();
+            return trackers.Where(tracker => tracker.UserId == userId)
+                .OrderBy(tracker => tracker.CreationDate)
+                .ToList().AsReadOnly();
         }
 
         public Option<Tracker> GetTracker(Guid actorId, Guid trackerId)
@@ -98,6 +86,5 @@ namespace ItHappened.Application
         }
 
         private readonly IRepository<Tracker> _trackersRepository;
-        private readonly IRepository<Event> _eventsRepository;
     }
 }
