@@ -7,9 +7,9 @@ namespace ItHappened.Domain.Customizations
     {
         public Guid Id { get; private  set;}
         public Guid EventId  { get; private  set; }
-        public byte[] Image { get; private  set; }
+        public string Image { get; private  set; }
 
-        public Photo(Guid id, Guid eventId, string name, byte[] image)
+        public Photo(Guid id, Guid eventId, string image)
         {
             Id = id;
             EventId = eventId;
