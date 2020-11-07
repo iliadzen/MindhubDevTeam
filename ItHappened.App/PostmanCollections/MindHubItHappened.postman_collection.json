@@ -262,7 +262,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{baseUrl}}/trackers/{{trackerId}}/events",
+					"raw": "{{baseUrl}}/trackers/{{trackerId}}/events?toDate=2020-10-10",
 					"host": [
 						"{{baseUrl}}"
 					],
@@ -270,6 +270,42 @@
 						"trackers",
 						"{{trackerId}}",
 						"events"
+					],
+					"query": [
+						{
+							"key": "period",
+							"value": "thisWeek",
+							"disabled": true
+						},
+						{
+							"key": "ratingMin",
+							"value": "1",
+							"disabled": true
+						},
+						{
+							"key": "ratingMax",
+							"value": "3",
+							"disabled": true
+						},
+						{
+							"key": "fromDate",
+							"value": "2020-10-01",
+							"disabled": true
+						},
+						{
+							"key": "toDate",
+							"value": "2020-10-10"
+						},
+						{
+							"key": "scaleMin",
+							"value": "20",
+							"disabled": true
+						},
+						{
+							"key": "scaleMax",
+							"value": "50",
+							"disabled": true
+						}
 					]
 				}
 			},
@@ -414,17 +450,17 @@
 	],
 	"variable": [
 		{
-			"id": "6135fe0b-f689-45e8-ae0e-1f09353a8415",
+			"id": "da11d964-7007-4930-b46d-f58fd478e43a",
 			"key": "baseUrl",
 			"value": "http://localhost:5000"
 		},
 		{
-			"id": "b687446c-2063-40b2-93c8-9e022c7e43b7",
+			"id": "4d18070c-d941-4bab-85db-0d7bae44e5df",
 			"key": "trackerId",
 			"value": "98C145C7-E4A5-4D2F-B79E-DD6E2CA4FCEE"
 		},
 		{
-			"id": "b0a4c156-a23f-4c6a-8c5d-c3f98af097d2",
+			"id": "9d7023ce-3bc5-4071-b715-049cb28182e3",
 			"key": "eventId",
 			"value": "8e5fb9cc-f32b-4710-a212-b8e08274b7d7"
 		}

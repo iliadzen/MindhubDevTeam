@@ -1,14 +1,18 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using ItHappened.App.Authentication;
 using ItHappened.App.Model;
 using ItHappened.Application;
+using ItHappened.Domain.Stats;
 using LanguageExt;
+using LanguageExt.UnsafeValueAccess;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 
-namespace ItHappened.App.Controller
+namespace ItHappened.App.Controllers
 {
     [Authorize]
     [Route("trackers/{trackerId}")]
@@ -43,10 +47,47 @@ namespace ItHappened.App.Controller
         
         [HttpGet]
         [Route("events")]
-        public IActionResult GetEvents([FromRoute] Guid trackerId)
+        public IActionResult GetEvents([FromRoute] Guid trackerId, 
+            [FromQuery] string period, [FromQuery] string fromDate, [FromQuery] string toDate,
+            [FromQuery] int ratingMin, [FromQuery] int ratingMax,
+            [FromQuery] decimal scaleMin, [FromQuery] decimal scaleMax)
         {
             var actorId = Guid.Parse(User.FindFirstValue(JwtClaimTypes.Id));
             var events = _eventService.GetEventsByTrackerId(actorId, trackerId);
+            
+            if(!period.IsNull())
+                if (period == "thisWeek")
+                    events = events.Where(@event => @event.CreationDate > DateTime.Now.GetLast(DayOfWeek.Monday))
+                        .ToList().AsReadOnly();
+            
+            //Date filter
+            if (!fromDate.IsNull())
+                events = events.Where(@event => @event.CreationDate > DateTime.Parse(fromDate))
+                    .ToList().AsReadOnly();
+            if(!toDate.IsNull())
+                events = events.Where(@event => @event.CreationDate < DateTime.Parse(toDate))
+                    .ToList().AsReadOnly();
+            
+            //Rating filter
+            if(ratingMin != 0)
+                events = events.Where(@event => CompareEventRating(actorId, @event.Id, ratingMin, 
+                        (x, y) => x >= y))
+                .ToList().AsReadOnly();
+            if(ratingMax != 0)
+                events = events.Where(@event => CompareEventRating(actorId, @event.Id, ratingMax,
+                        (x, y) => x <= y))
+                    .ToList().AsReadOnly();
+            
+            //Scale filter
+            if (scaleMin != 0)
+                events = events.Where(@event => CompareEventScale(actorId, @event.Id, scaleMin,
+                        (x, y) => x >= y))
+                    .ToList().AsReadOnly();
+            if (scaleMax != 0)
+                events = events.Where(@event => CompareEventScale(actorId, @event.Id, scaleMax,
+                        (x, y) => x <= y))
+                    .ToList().AsReadOnly();
+
             var response = new List<EventGetResponse>();
             foreach (var @event in events)
                 response.Add(new EventGetResponse(@event, 
@@ -165,6 +206,21 @@ namespace ItHappened.App.Controller
                 new GeotagGetResponse(tag.Longitude, tag.Latitude));
             optionPhoto.Do(photo => response.Photo = new PhotoGetResponse(photo.Image));
             return response;
+        }
+
+        private bool CompareEventRating(Guid actorId, Guid eventId, int threshold, Func<int, int, bool> Compare)
+        {
+            var optionRating = _customizationService.GetRating(actorId, eventId);
+            if (optionRating.IsNone) return false;
+            return Compare((int) optionRating.ValueUnsafe().Stars, threshold);
+        }
+        
+        private bool CompareEventScale(Guid actorId, Guid eventId, decimal threshold, 
+            Func<decimal, decimal, bool> Compare)
+        {
+            var optionScale = _customizationService.GetScale(actorId, eventId);
+            if (optionScale.IsNone) return false;
+            return Compare(optionScale.ValueUnsafe().Value, threshold);
         }
 
         private readonly IEventService _eventService;

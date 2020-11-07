@@ -8,7 +8,7 @@ using ItHappened.Domain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ItHappened.App.Controller
+namespace ItHappened.App.Controllers
 {
     [Authorize]
     [Route("trackers")]
