@@ -7,7 +7,7 @@ import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 
-import Tracker from '../Components/Tracker/TrackerPreview';
+import TrackerPreview from '../Components/Tracker/TrackerPreview';
 import LinkButton from '../Components/Common/LinkButton'
 
 const useStyles = makeStyles((theme) => ({
@@ -36,7 +36,7 @@ export default function TrackersList() {
             <LinkButton url="/" text="Go Back!"/>
             <Grid container className={classes.root} spacing={2}>
                 {
-                    trackersList.map((tracker) => <Tracker {...tracker} />)
+                    trackersList.map((tracker) => <TrackerPreview {...tracker} />)
                 }
             </Grid>
         </Container>

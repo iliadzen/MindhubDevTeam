@@ -143,6 +143,10 @@ namespace ItHappened.App.Controller
                     new GeotagForm(
                         createRequests.Geotag.Longitude, 
                         createRequests.Geotag.Latitude));
+            
+            if(!createRequests.Photo.IsNull())
+                _customizationService.AddPhotoToEvent(actorId, eventId,
+                    new PhotoForm(createRequests.Photo.DataUrl));
         }
 
         private CustomizationsGetResponses FillCustomizationsGetResponses(Guid actorId, Guid eventId)
@@ -152,12 +156,14 @@ namespace ItHappened.App.Controller
             var optionRating = _customizationService.GetRating(actorId, eventId);
             var optionScale = _customizationService.GetScale(actorId, eventId);
             var optionGeotag = _customizationService.GetGeotag(actorId, eventId);
+            var optionPhoto = _customizationService.GetPhoto(actorId, eventId);
 
             optionComment.Do(comment => response.Comment = new CommentGetResponse(comment.Content));
             optionRating.Do(rating => response.Rating = new RatingGetResponse((int)rating.Stars));
             optionScale.Do(scale => response.Scale = new ScaleGetResponse(scale.Value));
             optionGeotag.Do(tag => response.Geotag = 
                 new GeotagGetResponse(tag.Longitude, tag.Latitude));
+            optionPhoto.Do(photo => response.Photo = new PhotoGetResponse(photo.Image));
             return response;
         }
 

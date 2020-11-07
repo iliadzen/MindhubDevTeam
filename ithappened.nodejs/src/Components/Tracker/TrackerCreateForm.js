@@ -42,7 +42,7 @@ const TrackerCreateForm = ({onSubmit}) => {
         if (trackerCustomizations.rating) customizationsList.push(4);
         if (trackerCustomizations.geotag) customizationsList.push(1);
         if (trackerCustomizations.scale) customizationsList.push(3);
-        if (trackerCustomizations.photo) customizationsList.push(5);
+        if (trackerCustomizations.photo) customizationsList.push(0);
         onSubmit(trackerName, `[${customizationsList.toString()}]`);
     }
     return (

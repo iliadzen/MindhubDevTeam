@@ -60,6 +60,16 @@ namespace ItHappened.Application
             }
         }
 
+        public void AddPhotoToEvent(Guid actorId, Guid eventId, PhotoForm form)
+        {
+            if (!form.IsNull() && form.IsCorrectlyFilled())
+            {
+                var photo = new Photo(Guid.NewGuid(), eventId, form.DataUrl);
+                AddEventCustomizationData(actorId, eventId, photo, _photoRepository);
+            }
+            
+        }
+
         public Option<Comment> GetComment(Guid actorId, Guid eventId)
         {
             return GetEventCustomizationData<Comment>(actorId, eventId, _commentRepository);
@@ -80,6 +90,12 @@ namespace ItHappened.Application
             return GetEventCustomizationData<Geotag>(actorId, eventId, _geotagRepository);
         }
 
+        public Option<Photo> GetPhoto(Guid actorId, Guid eventId)
+        {
+            return GetEventCustomizationData<Photo>(actorId, eventId, _photoRepository);
+        }
+
+        
         public bool CheckTrackerHasCustomizationOfSuchDataType(IEnumerable<CustomizationType> customizations,
             IEventCustomizationData data)
         {

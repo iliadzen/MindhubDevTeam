@@ -1,14 +1,22 @@
-using ItHappened.Domain.Customizations;
+using Serilog;
 
 namespace ItHappened.Application
 {
-    public class PhotoForm
+    public class PhotoForm : IForm
     {
-        public byte[] Image { get; }
+        public string DataUrl { get; }
 
-        public PhotoForm(byte[] image)
+        public PhotoForm(string dataUrl)
         {
-            Image = image;
+            DataUrl = dataUrl;
+        }
+
+        public bool IsCorrectlyFilled()
+        {
+            if (!string.IsNullOrEmpty(DataUrl))
+                return true;
+            Log.Error($"Photo form filled incorrectly: string is null or empty.");
+            return false;
         }
     }
 }
