@@ -23,7 +23,6 @@ const welcomeText = () => (
             <LinkButton url={'users/signout'} text="Sign Out"/><br></br>
             <LinkButton url={'users/self'} text="Profile"/><br></br>
             <hr></hr>
-            <LinkButton url={'trackers/create'} color="secondary" text="Create Tracker"/><br></br>
             <LinkButton url={'trackers'} color="secondary" text="All Trackers"/><br></br>
         </div> :
         <div>
