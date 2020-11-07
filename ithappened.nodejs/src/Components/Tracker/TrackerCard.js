@@ -46,6 +46,7 @@ const TrackerCard = ({id, title, creationDate, modificationDate, customizations}
                     Delete
                 </Button>
             </CardActions>
+            <LinkButton url={`/trackers/${id}/events/create`} text="Create Event!" fullWidth={true}/>
         </Card>
         
     );

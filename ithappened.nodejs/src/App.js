@@ -8,6 +8,9 @@ import Trackers from "./Tracker/Trackers";
 import TrackerDetail from "./Tracker/TrackerDetail";
 import TrackerEdit from "./Tracker/TrackerEdit";
 import TrackerCreate from "./Tracker/TrackerCreate";
+import EventCreate from "./Event/EventCreate";
+import EventEdit from "./Event/EventEdit";
+import EventDetail from "./Event/EventDetail";
 import LinkButton from "./Components/Common/LinkButton"
 
 const welcomeText = () => (
@@ -45,14 +48,14 @@ const App = () => {
                     {!localStorage.getItem("accessToken") ? <Redirect to="/users/signin"/> : <UserEdit />}
                 </Route>
                 {/***************************************************************************************/}
-                <Route path="/trackers/:trackerId/event/create">
-                    {!localStorage.getItem("accessToken") ? <Redirect to="/users/signin"/> : <Trackers />}
+                <Route path="/trackers/:trackerId/events/create">
+                    {!localStorage.getItem("accessToken") ? <Redirect to="/users/signin"/> : <EventCreate />}
                 </Route>
-                <Route path="/trackers/:trackerId/event/:eventId/edit">
-                    {!localStorage.getItem("accessToken") ? <Redirect to="/users/signin"/> : <Trackers />}
+                <Route path="/trackers/:trackerId/events/:eventId/edit">
+                    {!localStorage.getItem("accessToken") ? <Redirect to="/users/signin"/> : <EventEdit />}
                 </Route>
-                <Route path="/trackers/:trackerId/event/:eventId">
-                    {!localStorage.getItem("accessToken") ? <Redirect to="/users/signin"/> : <Trackers />}
+                <Route path="/trackers/:trackerId/events/:eventId">
+                    {!localStorage.getItem("accessToken") ? <Redirect to="/users/signin"/> : <EventDetail />}
                 </Route>
                 {/***************************************************************************************/}
                 <Route path="/trackers/create">

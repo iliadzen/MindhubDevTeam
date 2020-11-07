@@ -18,3 +18,10 @@ export const getTracker = (trackerId) => instance.get(`/trackers/${trackerId}`, 
 export const editTracker = (trackerName, trackerId) => instance.put(`/trackers/${trackerId}`, {title: trackerName}, authorizedRequestConfig).then(result => result.data);
 export const deleteTracker = (trackerId) => instance.delete(`/trackers/${trackerId}`, authorizedRequestConfig).then(result => result.data);
 export const createTracker = (trackerTitle, trackerCustomizations) => instance.post(`/trackers`, {title: trackerTitle, customizations: trackerCustomizations}, authorizedRequestConfig).then(result => result.data);
+
+// Event
+export const createEvent = (trackerId, data) => instance.post(`/trackers/${trackerId}/events`, data, authorizedRequestConfig).then(result => result.data);
+export const editEvent = (trackerId, eventId, eventTitle, eventCustomizations) => instance.put(`/trackers/${trackerId}/events/${eventId}`, {title: eventTitle, customizations: eventCustomizations}, authorizedRequestConfig).then(result => result.data);
+export const deleteEvent = (trackerId, eventId) => instance.delete(`/trackers/${trackerId}/events/${eventId}`, authorizedRequestConfig).then(result => result.data);
+export const getEvents = (trackerId) => instance.get(`/trackers/${trackerId}/events`, authorizedRequestConfig).then(result => result.data);
+export const getEvent = (trackerId, eventId) => instance.get(`/trackers/${trackerId}/events/${eventId}`, authorizedRequestConfig).then(result => result.data);

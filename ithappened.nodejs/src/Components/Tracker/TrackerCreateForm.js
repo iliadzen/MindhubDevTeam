@@ -79,7 +79,7 @@ const TrackerCreateForm = ({onSubmit}) => {
                             label="Geotag"
                         />
                         <FormControlLabel
-                            control={<Checkbox checked={trackerCustomizations.photo} onChange={handleCheckboxChange} name="photo" />}
+                            control={<Checkbox disabled checked={trackerCustomizations.photo} onChange={handleCheckboxChange} name="photo" />}
                             label="Photo"
                         />
                     </FormGroup>
