@@ -12,18 +12,24 @@ import EventCreate from "./Event/EventCreate";
 import EventEdit from "./Event/EventEdit";
 import EventDetail from "./Event/EventDetail";
 import LinkButton from "./Components/Common/LinkButton"
+import "./App.css"
+import logo from "./mindhub.jpg"
 
 const welcomeText = () => (
-    <div>
-        <h1>It Happened!</h1>
-        <h3>Come as you are. Again.</h3>
-        <LinkButton url={'users/signup'} text="Sign Up"/><br></br>
-        <LinkButton url={'users/signin'} text="Sign In"/><br></br>
-        <LinkButton url={'users/signout'} text="Sign Out"/><br></br>
-        <LinkButton url={'users/self'} text="Profile"/><br></br>
-        <hr></hr>
-        <LinkButton url={'trackers/create'} color="secondary" text="Create Tracker"/><br></br>
-        <LinkButton url={'trackers'} color="secondary" text="All Trackers"/><br></br>
+    <div className = "welcome">
+        <img className="logo" src={logo}/>
+        {localStorage.getItem("accessToken") ? 
+        <div>
+            <LinkButton url={'users/signout'} text="Sign Out"/><br></br>
+            <LinkButton url={'users/self'} text="Profile"/><br></br>
+            <hr></hr>
+            <LinkButton url={'trackers/create'} color="secondary" text="Create Tracker"/><br></br>
+            <LinkButton url={'trackers'} color="secondary" text="All Trackers"/><br></br>
+        </div> :
+        <div>
+            <LinkButton url={'users/signup'} color="secondary" text="Sign Up"/><br></br>
+            <LinkButton url={'users/signin'} color="secondary" text="Sign In"/><br></br>
+        </div>}
     </div>
 );
 
