@@ -1,4 +1,5 @@
 import {BrowserRouter, Switch, Route, Redirect} from "react-router-dom";
+import StatsView from "./Stats/StatsView";
 import UserSignUp from "./User/UserSignUp";
 import UserSignIn from "./User/UserSignIn";
 import UserApp from "./User/UserApp";
@@ -76,6 +77,13 @@ const App = () => {
                 
                 <Route path="/trackers">
                     {!localStorage.getItem("accessToken") ? <Redirect to="/"/> : <Trackers />}
+                </Route>
+                {/***************************************************************************************/}
+                <Route path="/stats/:trackerId">
+                    {!localStorage.getItem("accessToken") ? <Redirect to="/users/signin"/> : <StatsView/>}
+                </Route>
+                <Route path="/stats">
+                    {!localStorage.getItem("accessToken") ? <Redirect to="/users/signin"/> : <StatsView/>}
                 </Route>
                 {/***************************************************************************************/}
                 <Route path="/" component={welcomeText}/>
