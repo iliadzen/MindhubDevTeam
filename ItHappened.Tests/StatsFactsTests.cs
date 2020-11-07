@@ -56,9 +56,9 @@ namespace ItHappened.Tests
             var statsFact = new BestTrackerEventStatsFact()
                 .Apply(eventsWithRating);
 
-            Assert.AreEqual(5, ((BestTrackerEventStatsFact)statsFact.ValueUnsafe()).BestRating);
+            Assert.AreEqual(5, ((BestTrackerEventStatsFact)statsFact.ValueUnsafe()).Rating);
             Assert.AreEqual(event1.Title, 
-                ((BestTrackerEventStatsFact)statsFact.ValueUnsafe()).BestEvent.Title);
+                ((BestTrackerEventStatsFact)statsFact.ValueUnsafe()).Event.Title);
         }
         
         [Test]
@@ -74,9 +74,9 @@ namespace ItHappened.Tests
             var statsFact = new BestTrackerEventStatsFact()
                 .Apply(eventsWithRating);
 
-            Assert.AreEqual(5, ((BestTrackerEventStatsFact)statsFact.ValueUnsafe()).BestRating);
+            Assert.AreEqual(5, ((BestTrackerEventStatsFact)statsFact.ValueUnsafe()).Rating);
             Assert.AreEqual(event2.Title, 
-                ((BestTrackerEventStatsFact)statsFact.ValueUnsafe()).BestEvent.Title);
+                ((BestTrackerEventStatsFact)statsFact.ValueUnsafe()).Event.Title);
         }
         
         [Test]
@@ -93,6 +93,56 @@ namespace ItHappened.Tests
                 .Apply(eventsWithRating);
 
             Assert.IsTrue(statsFact.IsNone);
+        }
+        
+        
+        [Test]
+        public void LongestBreakStatsFact_OnlyOneEvent_FactIsNone()
+        {
+            var tracker = EntityMaker.CreateSomeTracker(Guid.NewGuid(), _mockTrackerRepository);
+            EntityMaker.CreateSomeEvent(tracker.Id, _mockEventRepository);
+            
+            var statsFact = new LongestBreakStatsFact()
+                .Apply(_mockEventRepository.GetAll());
+
+            Assert.IsTrue(statsFact.IsNone);
+        }
+
+        [Test]
+        public void LongestBreakStatsFact_TwoEventsWithThreeDaysBreak_CorrectBreak()
+        {
+            var tracker = EntityMaker.CreateSomeTracker(Guid.NewGuid(), _mockTrackerRepository);
+            var date1 = new DateTime(2020, 1, 1, 1, 0, 0);
+            var date2 = new DateTime(2020, 1, 4, 2, 0, 0);
+            var event1 = new Event(Guid.NewGuid(), tracker.Id, "Event1", date1, date1);
+            var event2 = new Event(Guid.NewGuid(), tracker.Id, "Event2", date2, date2);
+            _mockEventRepository.Save(event1);
+            _mockEventRepository.Save(event2);
+            
+            var statsFact = new LongestBreakStatsFact()
+                .Apply(_mockEventRepository.GetAll());
+
+            Assert.AreEqual(3, ((LongestBreakStatsFact)statsFact).Break.Days);
+        }
+        
+        [Test]
+        public void LongestBreakStatsFact_ThreeEventsWithMaxFourDaysBreak_CorrectBreak()
+        {
+            var tracker = EntityMaker.CreateSomeTracker(Guid.NewGuid(), _mockTrackerRepository);
+            var date1 = new DateTime(2020, 1, 1, 1, 0, 0);
+            var date2 = new DateTime(2020, 1, 5, 2, 0, 0);
+            var date3 = new DateTime(2020, 1, 6, 3, 0, 0);
+            var event1 = new Event(Guid.NewGuid(), tracker.Id, "Event1", date1, date1);
+            var event2 = new Event(Guid.NewGuid(), tracker.Id, "Event2", date2, date2);
+            var event3 = new Event(Guid.NewGuid(), tracker.Id, "Event3", date3, date3);
+            _mockEventRepository.Save(event1);
+            _mockEventRepository.Save(event2);
+            _mockEventRepository.Save(event3);
+            
+            var statsFact = new LongestBreakStatsFact()
+                .Apply(_mockEventRepository.GetAll());
+
+            Assert.AreEqual(4, ((LongestBreakStatsFact)statsFact).Break.Days);
         }
 
         private RepositoryMock<Tracker> _mockTrackerRepository;

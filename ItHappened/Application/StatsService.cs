@@ -12,7 +12,9 @@ namespace ItHappened.Application
         public static IEnumerable<IStatsFact> GetStatsFactsForTracker(Dictionary<Event, int> eventsWithRating)
         {
             return new List<IStatsFact>()
-                .Concat(new BestTrackerEventStatsFact().Apply(eventsWithRating));
+                .Concat(new BestTrackerEventStatsFact().Apply(eventsWithRating))
+                .Concat(new WorseTrackerEventStatsFact().Apply(eventsWithRating))
+                .Concat(new LongestBreakStatsFact().Apply(eventsWithRating.Keys));
         }
 
         public static IEnumerable<IStatsFact> GetStatsFactsForUser(IEnumerable<Event> events)
