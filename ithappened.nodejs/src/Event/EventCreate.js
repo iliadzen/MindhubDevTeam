@@ -42,15 +42,14 @@ const EventCreate = () => {
             title: eventTitle,
             customizations: eventCustomizations
         }
-        console.log(request);
-        await eventCustomizations.Photo.DataUrl;
+        if (eventCustomizations.Photo != "") await eventCustomizations.Photo.DataUrl;
         await createEvent(tracker.id, request);
         history.push(`/trackers/${trackerId}`);
 
     }
     
     return (
-        <Container component="main" maxWidth="xs">
+        <Container component="main" style={{paddingRight: "15vw"}}>
             <LinkButton url={`/trackers/${trackerId}`} text="Go Back!" />
             <EventCreateForm className={classes.root} onSubmit={handleCreate} tracker={tracker}/>
         </Container>

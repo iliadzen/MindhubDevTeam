@@ -29,7 +29,7 @@ export default function EventDetail() {
     }, []);
 
     return (
-        <Container component="main" maxWidth="xs">
+        <Container component="main" style={{paddingRight: "15vw"}}>
             <LinkButton url={`/trackers/${trackerId}`} text="Go Back!" />
             <EventCard {...event} trackerId={trackerId}/>
         </Container>
