@@ -21,14 +21,16 @@ const welcomeText = () => (
         <img className="logo" src={logo}/>
         {localStorage.getItem("accessToken") ? 
         <div>
-            <LinkButton url={'users/signout'} text="Sign Out"/><br></br>
-            <LinkButton url={'users/self'} text="Profile"/><br></br>
+            <LinkButton url={'/users/signout'} text="Sign Out"/><br></br>
+            <LinkButton url={'/users/self'} text="Profile"/><br></br>
             <hr></hr>
-            <LinkButton url={'trackers'} color="secondary" text="All Trackers"/><br></br>
+            <LinkButton url={'/trackers'} color="secondary" text="All Trackers"/><br></br>
+            <hr></hr>
+            <LinkButton url={'/stats'} color="primary" text="Stats'n'Facts"/><br></br>
         </div> :
         <div>
-            <LinkButton url={'users/signup'} color="secondary" text="Sign Up"/><br></br>
-            <LinkButton url={'users/signin'} color="secondary" text="Sign In"/><br></br>
+            <LinkButton url={'/users/signup'} color="secondary" text="Sign Up"/><br></br>
+            <LinkButton url={'/users/signin'} color="secondary" text="Sign In"/><br></br>
         </div>}
     </div>
 );

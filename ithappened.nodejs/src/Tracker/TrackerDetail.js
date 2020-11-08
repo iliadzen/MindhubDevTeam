@@ -57,8 +57,10 @@ export default function TrackerDetail() {
     });
 
     return (
-        <Container component="main" maxWidth="xs">
-            <LinkButton url={`/trackers`} text="Go Back!" />
+        <Container component="main" style={{paddingRight: "15vw"}}>
+            <LinkButton url={`/trackers`} text="Go Back!" /><span>    </span>
+            <LinkButton url={`/stats/${trackerId}`} color="secondary" text="Tracker Stats'n'Facts"/>
+            <hr></hr>
             <TrackerCard {...tracker} />
             <hr></hr>
             <Button
@@ -80,6 +82,8 @@ export default function TrackerDetail() {
             >
                 Reset Filters - All Time
             </Button>
+            <hr></hr>
+            <h3 style={{color:"white"}}>Date Filters</h3>
             <Button
                 style={{margin: "3px"}}
                 variant="contained"
@@ -119,8 +123,10 @@ export default function TrackerDetail() {
             />
             <hr></hr>
             {tracker.customizations.includes("Rating")
-            ? <div><TextField
-                style={{backgroundColor:"white", borderRadius:"3px", margin: "3px", padding: "3px", width:"30%"}}
+            ? <div>
+                <h3 style={{color:"white"}}>Rating Filters</h3>
+                <TextField
+                style={{backgroundColor:"white", borderRadius:"3px", margin: "3px", padding: "3px", width:"80px"}}
                 label="Min Rating"
                 type="number"
                 InputProps={{ inputProps: { min: 0, max: 5 } }}
@@ -134,7 +140,7 @@ export default function TrackerDetail() {
                 }}
             />
             <TextField
-                style={{backgroundColor:"white", borderRadius:"3px", margin: "3px", padding: "3px", width:"30%"}}
+                style={{backgroundColor:"white", borderRadius:"3px", margin: "3px", padding: "3px", width:"8    0px"}}
                 label="Max Rating"
                 type="number"
                 InputProps={{ inputProps: { min: 0, max: 5 } }}
@@ -151,8 +157,10 @@ export default function TrackerDetail() {
             </div>
             : []}
             {tracker.customizations.includes("Scale")
-            ? <div><TextField
-                style={{backgroundColor:"white", borderRadius:"3px", margin: "3px", padding: "3px", width:"30%"}}
+            ? <div>
+                <h3 style={{color:"white"}}>Scale Filters</h3>
+                <TextField
+                style={{backgroundColor:"white", borderRadius:"3px", margin: "3px", padding: "3px", maxWidth:"150px"}}
                 label="Min Scale"
                 type="number"
                 defaultValue="0"
@@ -165,7 +173,7 @@ export default function TrackerDetail() {
                 }}
             />
             <TextField
-                style={{backgroundColor:"white", borderRadius:"3px", margin: "3px", padding: "3px", width:"30%"}}
+                style={{backgroundColor:"white", borderRadius:"3px", margin: "3px", padding: "3px", maxWidth:"150px"}}
                 label="Max Rating"
                 type="number"
                 defaultValue="100"
@@ -180,6 +188,7 @@ export default function TrackerDetail() {
             <hr></hr>
             </div>
             : []}
+            <h2  style={{color:"white"}} >Events</h2>
             <Grid container spacing={2}>
                 {
                     eventsList.map((event) => <EventPreview {...event} trackerId={trackerId}/>)

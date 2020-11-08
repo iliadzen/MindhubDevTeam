@@ -25,12 +25,13 @@ const TrackerCard = ({id, title, creationDate, modificationDate, customizations}
     }
 
     return (
+        <div>
         <Card className={classes.card}>
             <CardContent>
                 <h3>{title}</h3>
-                <p>Creation date: {creationDate}</p>
-                <p>Modification date: {modificationDate}</p>
-                <p>Customizations: {customizations.join(", ")}</p>
+                <p>Created at: <i>{creationDate}</i></p>
+                <p>Last modification: <i>{modificationDate}</i></p>
+                <p>Customizations: <i>{customizations.join(", ")}</i></p>
             </CardContent>
             <CardActions>
                 <LinkButton url={`/trackers/${id}/edit`} text="Edit" fullWidth={true}/>
@@ -46,9 +47,9 @@ const TrackerCard = ({id, title, creationDate, modificationDate, customizations}
                     Delete
                 </Button>
             </CardActions>
-            <LinkButton url={`/trackers/${id}/events/create`} text="Create Event!" fullWidth={true}/>
         </Card>
-        
+        <LinkButton url={`/trackers/${id}/events/create`} text="Create Event!" fullWidth={true}/>
+        </div>
     );
 }
 

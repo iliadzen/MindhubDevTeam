@@ -31,7 +31,7 @@ export default function TrackerEdit() {
 
     return (
         <Container component="main" maxWidth="xs">
-            <LinkButton url={`/`} text="Go Back!" />
+            <LinkButton url={`/trackers`} text="Go Back!" />
             <TrackerCreateForm className={classes.root} tracker={tracker} onSubmit={handleCreate}/>
         </Container>
     );
